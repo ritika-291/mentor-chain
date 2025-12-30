@@ -4,7 +4,7 @@ import WorkCard from '../cards/WorkCard';
 
 const HowItWorks = () => {
   return (
-    <section className="bg-gray-900 text-white py-16 px-4">
+    <section id="howItWorks" className="bg-gray-900 text-white py-16 px-4">
       <div className="container mx-auto">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 tracking-wide">
           How MentorChain Works!
@@ -23,6 +23,7 @@ const HowItWorks = () => {
               description={step.description}
               buttonText={step.buttonText}
               image={step.image}
+              link={step.link}
             />
           ))}
         </div>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-const Password = ({ value, onChange }) => {
+const Password = ({ value, onChange, label = "Password" }) => {
   const [show, setShow] = useState(false);
 
   return (
     <div className="space-y-2">
-      <label className="text-gray-300 font-medium">Password</label>
+      <label className="text-gray-300 font-medium">{label}</label>
       <div className="relative">
         <input
           type={show ? "text" : "password"}

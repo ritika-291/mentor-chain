@@ -1,8 +1,11 @@
 import React from 'react'
+import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import MentorLayout from './pages/Dashboard/MentorLayout'
 // Mentor Dashboard Pages
 import Overview from './pages/Dashboard/Overview';
@@ -23,19 +26,27 @@ import MentorProfileDetail from './pages/MentorProfileDetail'; // New import
 
 
 const App = () => {
-  
-  const router=createBrowserRouter([
+
+  const router = createBrowserRouter([
     {
-       path:'/',
-       element:<Home/>
-    },
-   {
-       path:'/login',
-       element:<Login/>
+      path: '/',
+      element: <Home />
     },
     {
-       path:'/signup',
-       element:<SignUp/>
+      path: '/login',
+      element: <Login />
+    },
+    {
+      path: '/signup',
+      element: <SignUp />
+    },
+    {
+      path: '/forgot-password',
+      element: <ForgotPassword />
+    },
+    {
+      path: '/reset-password/:token',
+      element: <ResetPassword />
     },
     {
       path: '/mentors/:mentorId', // New route for individual mentor profiles
@@ -67,10 +78,13 @@ const App = () => {
         { path: 'settings', element: <MenteeSettings /> },
       ],
     }
-   
+
   ])
   return (
-    <RouterProvider router={router}></RouterProvider>
+    <>
+      <Toaster position="top-right" />
+      <RouterProvider router={router}></RouterProvider>
+    </>
   )
 }
 

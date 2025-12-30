@@ -41,21 +41,23 @@ const Navbar = () => {
                                 </a>
                             </li>
                             <li>
-                                <NavLink to='/work' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out">
+                                <a href='#howItWorks' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out">
                                     Works
-                                </NavLink>
+                                </a>
                             </li>
                             <li>
-                                <NavLink to='/features' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out">
+                                <a href='#features' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out">
                                     Features
-                                </NavLink>
+                                </a>
                             </li>
                         </ul>
                     </nav>
 
                     <div className='flex items-center space-x-4'>
                         <button className="bg-transparent border border-white text-white font-semibold py-2 px-6 rounded-full transition duration-300 ease-in-out hover:bg-white hover:text-gray-900">
-                            Sign Up
+                            <NavLink to='/signup'>
+                                Sign Up
+                            </NavLink>
                         </button>
                         <button className='bg-white text-gray-900 font-semibold py-2 px-6 rounded-full transition duration-300 ease-in-out hover:bg-transparent hover:text-white hover:border hover:border-white'>
                             <NavLink to='/login'>
@@ -85,14 +87,14 @@ const Navbar = () => {
                                 </a>
                             </li>
                             <li>
-                                <NavLink to='/work' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out" onClick={() => setIsMenuOpen(false)}>
+                                <a href='#howItWorks' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out" onClick={() => setIsMenuOpen(false)}>
                                     Works
-                                </NavLink>
+                                </a>
                             </li>
                             <li>
-                                <NavLink to='/features' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out" onClick={() => setIsMenuOpen(false)}>
+                                <a href='#features' className="text-white font-medium hover:text-teal-400 transition duration-300 ease-in-out" onClick={() => setIsMenuOpen(false)}>
                                     Features
-                                </NavLink>
+                                </a>
                             </li>
                         </ul>
                     </nav>

@@ -1,17 +1,67 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import mentorDetailsData from '../data/MentorDetailsData'; 
+import mentorDetailsData from '../data/MentorDetailsData';
 
 const MentorProfileDetail = () => {
-  const { mentorId } = useParams(); 
+  const { mentorId } = useParams();
 
   const [mentor, setMentor] = useState(null);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    // Find the mentor in your data based on mentorId
-    const foundMentor = mentorDetailsData.find(m => m.id === parseInt(mentorId));
-    setMentor(foundMentor);
+    const fetchMentor = async () => {
+      setLoading(true);
+      console.log("Fetching profile for mentorId:", mentorId);
+
+      // Check if it's a real mentor (based on ID prefix)
+      if (typeof mentorId === 'string' && mentorId.startsWith('real-')) {
+        const realId = mentorId.replace('real-', '');
+        try {
+          console.log(`Fetching from API: http://localhost:5000/api/mentors/${realId}/profile`);
+          const response = await fetch(`http://localhost:5000/api/mentors/${realId}/profile`);
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Fetched real mentor data:", data);
+
+            // Handle potential missing profile object
+            const profile = data.profile || {};
+            const user = data.user || {};
+
+            setMentor({
+              id: mentorId,
+              name: user.username || 'Unknown Mentor',
+              title: profile.expertise && profile.expertise[0] ? `${profile.expertise[0]} Expert` : 'Mentor',
+              expertise: profile.expertise || [],
+              bio: profile.bio || "No bio available.",
+              image: profile.avatar_url ? `http://localhost:5000${profile.avatar_url}` : 'https://via.placeholder.com/150',
+              rating: profile.rating || 5.0,
+              availability_status: profile.availability_status === 'available' ? 'High' : (profile.availability_status === 'busy' ? 'Low' : 'Medium'),
+              reviews: profile.reviews_count || 0
+            });
+          } else {
+            console.error("Failed to fetch real mentor profile. Status:", response.status);
+            setMentor(null);
+          }
+        } catch (error) {
+          console.error("Error fetching real mentor:", error);
+          setMentor(null);
+        }
+      } else {
+        // Fallback to dummy data
+        const foundMentor = mentorDetailsData.find(m => m.id === parseInt(mentorId));
+        setMentor(foundMentor);
+      }
+      setLoading(false);
+    };
+
+    fetchMentor();
   }, [mentorId]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   if (!mentor) {
     return (

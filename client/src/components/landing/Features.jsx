@@ -4,7 +4,7 @@ import MentorCard from '../cards/MentorCard';
 
 const Features = () => {
   return (
-    <section className="bg-gray-900 text-white py-12">
+    <section id="features" className="bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 tracking-wide">
           Explore Our Mentors

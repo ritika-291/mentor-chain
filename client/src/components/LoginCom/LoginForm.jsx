@@ -3,20 +3,53 @@ import InputField from './InputField';
 import Password from './Password';
 import { Link, useNavigate } from 'react-router-dom';
 
-const LoginForm = () => {
+const LoginForm = ({ role }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("logging in as: ", email, password);
-    navigate('/');
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // important to receive httpOnly refresh cookie
+        body: JSON.stringify({ email, password, role }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Login successful:', data);
+        // Store token and user data
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        if (role === "Mentor") {
+          navigate('/mentor');
+        } else {
+          navigate('/mentee');
+        }
+      } else {
+        console.error('Login failed:', data.message || 'Something went wrong');
+        alert(data.message || 'Login failed!'); // Show an alert for feedback
+      }
+    } catch (error) {
+      console.error('Network or parsing error during login:', error);
+      alert('Server connection error or response parsing issue. Please check console for details.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <InputField label="Email" type="email" value={email} onChange={setEmail} />
+      <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <Password value={password} onChange={setPassword} />
       <button
         type="submit"
@@ -24,12 +57,12 @@ const LoginForm = () => {
       >
         Login
       </button>
-       <p className="text-center text-gray-400 text-sm">
-        Don't have an account? 
+      <p className="text-center text-gray-400 text-sm">
+        Don't have an account?
         <Link to="/signup" className="ml-1 font-medium text-teal-400 hover:underline">
           Sign up
         </Link>
-      
+
       </p>
     </form>
   );
