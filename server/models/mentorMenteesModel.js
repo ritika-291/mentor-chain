@@ -2,14 +2,17 @@ import db from '../config/db.js';
 
 const MentorMentees = {
     async listMentees(mentorId, { limit = 50, offset = 0 } = {}) {
+        const limitInt = parseInt(limit, 10);
+        const offsetInt = parseInt(offset, 10);
+
         const [rows] = await db.execute(
-            `SELECT mm.mentor_id, mm.mentee_id, mm.status, mm.started_at, u.username, u.email, u.created_at AS mentee_created_at
+            `SELECT mm.mentor_id, mm.mentee_id, mm.status, mm.created_at, u.username, u.email
             FROM mentor_mentees mm
             JOIN users u ON u.id = mm.mentee_id
             WHERE mm.mentor_id = ?
             ORDER BY mm.created_at DESC
-            LIMIT ? OFFSET ?`,
-            [mentorId, parseInt(limit, 10), parseInt(offset, 10)]
+            LIMIT ${limitInt} OFFSET ${offsetInt}`,
+            [mentorId]
         );
         return rows;
     },
@@ -24,17 +27,24 @@ const MentorMentees = {
 
     async createRelationship(mentorId, menteeId, status = 'requested') {
         const [result] = await db.execute(
-            'INSERT INTO mentor_mentees (mentor_id, mentee_id, status, started_at) VALUES (?, ?, ?, ?)',
-            [mentorId, menteeId, status, status === 'active' ? new Date() : null]
+            'INSERT INTO mentor_mentees (mentor_id, mentee_id, status) VALUES (?, ?, ?)',
+            [mentorId, menteeId, status]
         );
         return result;
     },
 
     async updateStatus(mentorId, menteeId, status) {
         const [result] = await db.execute(
-            'UPDATE mentor_mentees SET status = ?, started_at = CASE WHEN ? = ' +
-            "'active'" + ' THEN ? ELSE started_at END WHERE mentor_id = ? AND mentee_id = ?',
-            [status, status, status === 'active' ? new Date() : null, mentorId, menteeId]
+            'UPDATE mentor_mentees SET status = ? WHERE mentor_id = ? AND mentee_id = ?',
+            [status, mentorId, menteeId]
+        );
+        return result;
+    },
+
+    async reRequestRelationship(mentorId, menteeId) {
+        const [result] = await db.execute(
+            'UPDATE mentor_mentees SET status = ?, created_at = NOW() WHERE mentor_id = ? AND mentee_id = ?',
+            ['requested', mentorId, menteeId]
         );
         return result;
     },

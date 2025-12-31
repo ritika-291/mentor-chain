@@ -14,12 +14,16 @@ const Message = {
     async listMessages(conversationId, limit = 50, beforeId = null) {
         let query = 'SELECT id, conversation_id, sender_id, text as content, created_at FROM messages WHERE conversation_id = ?';
         const params = [conversationId];
+
         if (beforeId) {
             query += ' AND id < ?';
             params.push(beforeId);
         }
-        query += ' ORDER BY id DESC LIMIT ?';
-        params.push(limit);
+
+        // Fix for "Incorrect arguments to mysqld_stmt_execute" with LIMIT
+        const limitInt = parseInt(limit, 10) || 50;
+        query += ` ORDER BY id DESC LIMIT ${limitInt}`;
+
         const [rows] = await db.execute(query, params);
         return rows.reverse(); // return in chronological order
     },

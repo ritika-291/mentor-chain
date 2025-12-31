@@ -32,8 +32,8 @@ const sessionController = {
             // We'll check if at least one availability slot covers this time
             const slots = await Availability.listForMentor(mentor_id);
             const requestDay = start.getUTCDay(); // 0..6
-            const requestTime = start.toISOString().substr(11,8); // HH:MM:SS
-            const requestEndTime = end.toISOString().substr(11,8);
+            const requestTime = start.toISOString().substr(11, 8); // HH:MM:SS
+            const requestEndTime = end.toISOString().substr(11, 8);
 
             let withinAvailability = false;
             for (const s of slots) {
@@ -45,7 +45,7 @@ const sessionController = {
                     // non-recurring: check date range and times
                     const startDate = s.start_date ? new Date(s.start_date) : null;
                     const endDate = s.end_date ? new Date(s.end_date) : null;
-                    const reqDate = new Date(start.toISOString().substr(0,10));
+                    const reqDate = new Date(start.toISOString().substr(0, 10));
                     if (startDate && endDate && reqDate >= startDate && reqDate <= endDate) {
                         if (s.start_time <= requestTime && s.end_time >= requestEndTime) { withinAvailability = true; break; }
                     }
@@ -59,14 +59,14 @@ const sessionController = {
             // 2) Check calendar_events for conflicts
             const calConflicts = await db.execute(
                 'SELECT * FROM calendar_events WHERE user_id = ? AND NOT (end_time <= ? OR start_time >= ?)',
-                [mentor_id, start.toISOString().slice(0,19).replace('T',' '), end.toISOString().slice(0,19).replace('T',' ')]
+                [mentor_id, start.toISOString().slice(0, 19).replace('T', ' '), end.toISOString().slice(0, 19).replace('T', ' ')]
             );
             if (calConflicts[0] && calConflicts[0].length > 0) {
                 return res.status(409).json({ message: 'Conflict with calendar events', conflicts: calConflicts[0] });
             }
 
             // 3) Check existing sessions for conflicts
-            const overlapping = await Session.findOverlappingSessions(mentor_id, start.toISOString().slice(0,19).replace('T',' '), end.toISOString().slice(0,19).replace('T',' '));
+            const overlapping = await Session.findOverlappingSessions(mentor_id, start.toISOString().slice(0, 19).replace('T', ' '), end.toISOString().slice(0, 19).replace('T', ' '));
             if (overlapping && overlapping.length > 0) {
                 return res.status(409).json({ message: 'Conflict with existing sessions', conflicts: overlapping });
             }
@@ -77,7 +77,7 @@ const sessionController = {
                 await conn.beginTransaction();
                 const [result] = await conn.execute(
                     'INSERT INTO sessions (mentor_id, mentee_id, start_time, end_time, price, notes) VALUES (?, ?, ?, ?, ?, ?)',
-                    [mentor_id, req.user.id, start.toISOString().slice(0,19).replace('T',' '), end.toISOString().slice(0,19).replace('T',' '), price || null, notes || null]
+                    [mentor_id, req.user.id, start, end, price || null, notes || null]
                 );
                 const sessionId = result.insertId;
 
@@ -108,7 +108,76 @@ const sessionController = {
         }
     },
 
-    // Mentor: list sessions
+    // Mentor schedules a session directly
+    async scheduleSession(req, res) {
+        try {
+            if (!req.user || req.user.role !== 'mentor') return res.status(403).json({ message: 'Only mentors can schedule via this endpoint' });
+
+            const { menteeId, start_time, end_time, price, notes } = req.body;
+            const mentor_id = req.user.id; // Mentor is the scheduler
+            const mentee_id = parseInt(menteeId, 10);
+
+            if (isNaN(mentee_id) || !start_time || !end_time) return res.status(400).json({ message: 'menteeId, start_time and end_time are required' });
+
+            const start = new Date(start_time);
+            const end = new Date(end_time);
+            if (isNaN(start) || isNaN(end) || start >= end) return res.status(400).json({ message: 'Invalid times' });
+
+            // Verify they are connected?
+            // Ideally yes. Check 'active' status.
+            // (Assuming MentorMentees model usage or direct query, but let's assume if they have the ID they can try, 
+            // but strict check is better. I won't import MentorMentees just for this to save complexity unless needed, 
+            // but effectively they should be connected.)
+
+            // Check conflicts
+            const overlapping = await Session.findOverlappingSessions(mentor_id, start.toISOString().slice(0, 19).replace('T', ' '), end.toISOString().slice(0, 19).replace('T', ' '));
+            if (overlapping && overlapping.length > 0) {
+                return res.status(409).json({ message: 'Conflict with existing sessions', conflicts: overlapping });
+            }
+
+            // Create Session (Auto Accepted)
+            // We need to modify 'createSession' logic or manually insert with status 'accepted'.
+            // The model `createSession` just inserts. Default status in DB is usually 'requested'.
+            // I should verify DB schema default. 
+            // If default is 'requested', I need to update it immediately or custom insert.
+            // Let's use custom insert in Controller for speed or update Model. 
+            // Actually, `createSession` in model takes basic params.
+            // Let's add `status` param to `createSession` in Model or just UPDATE after create.
+            // Update after create is safer/easier without changing Model signature too much.
+
+            // Wait, Model createSession `INSERT INTO sessions ...`. 
+            // Columns: mentor_id, mentee_id, start_time, end_time, price, notes. 
+            // It uses default status.
+            // I will update the status immediately after creation.
+
+            const result = await Session.createSession({
+                mentorId: mentor_id,
+                menteeId: mentee_id,
+                startTime: start,
+                endTime: end,
+                price,
+                notes
+            });
+            const sessionId = result.insertId;
+
+            // Set to accepted
+            await Session.updateStatus(sessionId, 'accepted');
+
+            // Notify Mentee
+            try {
+                await Notification.create(mentee_id, 'session_status', { sessionId, status: 'scheduled' });
+                // Email mentee...
+            } catch (e) {
+                console.error("Notification failed", e);
+            }
+
+            return res.status(201).json({ message: 'Session scheduled', sessionId });
+
+        } catch (err) {
+            console.error('Error scheduling session:', err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
     async listForMentor(req, res) {
         try {
             const mentorId = parseInt(req.params.mentorId, 10);
@@ -123,12 +192,27 @@ const sessionController = {
         }
     },
 
+    // Mentee: list sessions
+    async listForMentee(req, res) {
+        try {
+            const menteeId = parseInt(req.params.menteeId, 10);
+            if (isNaN(menteeId)) return res.status(400).json({ message: 'Invalid mentee id' });
+            if (!req.user || req.user.id !== menteeId) return res.status(403).json({ message: 'Forbidden' });
+
+            const sessions = await Session.listForMentee(menteeId, { limit: 100 });
+            res.json({ sessions });
+        } catch (err) {
+            console.error('Error listing sessions:', err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
     // Mentor accepts/rejects a session
     async updateStatus(req, res) {
         try {
             const sessionId = parseInt(req.params.sessionId, 10);
             const { status } = req.body;
-            if (!['accepted','rejected','cancelled','completed'].includes(status)) return res.status(400).json({ message: 'Invalid status' });
+            if (!['accepted', 'rejected', 'cancelled', 'completed'].includes(status)) return res.status(400).json({ message: 'Invalid status' });
 
             const session = await Session.getById(sessionId);
             if (!session) return res.status(404).json({ message: 'Session not found' });

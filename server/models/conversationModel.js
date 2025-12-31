@@ -39,6 +39,19 @@ const Conversation = {
     async isParticipant(conversationId, userId) {
         const [rows] = await db.execute('SELECT * FROM conversation_participants WHERE conversation_id = ? AND user_id = ? LIMIT 1', [conversationId, userId]);
         return rows.length > 0;
+    },
+
+    async findConversationBetween(user1Id, user2Id) {
+        // Find existing 1-on-1 conversation
+        const [rows] = await db.execute(`
+            SELECT c.id 
+            FROM conversations c
+            JOIN conversation_participants cp1 ON c.id = cp1.conversation_id
+            JOIN conversation_participants cp2 ON c.id = cp2.conversation_id
+            WHERE cp1.user_id = ? AND cp2.user_id = ?
+            GROUP BY c.id
+        `, [user1Id, user2Id]);
+        return rows.length > 0 ? rows[0] : null;
     }
 };
 

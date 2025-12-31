@@ -13,33 +13,55 @@ const Mentors = () => {
 
     // Fetch real mentors from API and merge with dummy data
     React.useEffect(() => {
-        const fetchMentors = async () => {
+        const fetchMentorsAndStatus = async () => {
             try {
+                // 1. Fetch Mentors
                 const response = await fetch('http://localhost:5000/api/mentors');
                 if (response.ok) {
                     const realMentors = await response.json();
 
-                    // Transform real mentors to match the shape of dummy data
-                    const formattedRealMentors = realMentors.map(m => ({
-                        id: `real-${m.id}`, // Ensure unique ID
-                        name: m.username,
-                        title: m.expertise && m.expertise[0] ? `${m.expertise[0]} Expert` : 'Mentor', // Derive title if missing
-                        expertise: m.expertise || [],
-                        rating: m.rating || 5.0, // Default rating for new mentors
-                        availability_status: m.availability_status === 'available' ? 'High' : (m.availability_status === 'busy' ? 'Low' : 'Medium'),
-                        mentee_count: 0, // Default for now
-                        avatar_url: m.avatar_url // Pass avatar_url if available
+                    // 2. Fetch Status for each mentor (if logged in as mentee)
+                    const userStr = localStorage.getItem('user');
+                    const user = userStr ? JSON.parse(userStr) : null;
+                    const token = localStorage.getItem('token');
+
+                    const mentorsWithStatus = await Promise.all(realMentors.map(async (m) => {
+                        let status = 'none';
+                        if (user && user.role === 'mentee' && token) {
+                            try {
+                                const statusRes = await fetch(`http://localhost:5000/api/mentors/${m.id}/mentees/status`, {
+                                    headers: { 'Authorization': `Bearer ${token}` }
+                                });
+                                if (statusRes.ok) {
+                                    const statusData = await statusRes.json();
+                                    status = statusData.status;
+                                }
+                            } catch (ignore) { }
+                        }
+
+                        return {
+                            id: `real-${m.id}`,
+                            realId: m.id, // Store raw ID for logic
+                            name: m.username,
+                            title: m.expertise && m.expertise[0] ? `${m.expertise[0]} Expert` : 'Mentor',
+                            expertise: m.expertise || [],
+                            rating: m.rating || 5.0,
+                            availability_status: m.availability_status === 'available' ? 'High' : (m.availability_status === 'busy' ? 'Low' : 'Medium'),
+                            mentee_count: 0,
+                            avatar_url: m.avatar_url,
+                            connection_status: status // 'none', 'requested', 'active'
+                        };
                     }));
 
                     // distinct by ID or just append? User said "along all the dummy data"
                     // We will append real mentors to the top or mix them in.
-                    setAllMentors([...formattedRealMentors, ...mentorDetailsData]);
+                    setAllMentors([...mentorsWithStatus, ...mentorDetailsData]);
                 }
             } catch (error) {
                 console.error('Failed to fetch real mentors:', error);
             }
         };
-        fetchMentors();
+        fetchMentorsAndStatus();
     }, []);
 
     // Extract all unique expertise domains for the filter dropdown
@@ -115,18 +137,22 @@ const Mentors = () => {
                     </select>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Showing **{filteredAndSortedMentors.length}** mentors matching your criteria.
+                    Showing {filteredAndSortedMentors.length} mentors matching your criteria.
                 </p>
             </div>
 
-            {/* --- Mentors List (Mapping the Card) --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAndSortedMentors.map((mentor) => (
-                    // 🔑 Key change: Pass the entire 'mentor' object as the prop
-                    <MentorProfileCard
-                        key={mentor.id}
-                        mentor={mentor} // Pass the full object
-                    />
+            {/* Mentors Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredAndSortedMentors.map(mentor => (
+                    <div key={mentor.id} className="relative">
+                        <MentorProfileCard mentor={mentor} />
+                        {mentor.connection_status && mentor.connection_status !== 'none' && (
+                            <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white ${mentor.connection_status === 'active' ? 'bg-green-500' : 'bg-yellow-500'
+                                }`}>
+                                {mentor.connection_status === 'active' ? 'Connected' : 'Requested'}
+                            </div>
+                        )}
+                    </div>
                 ))}
             </div>
         </div>

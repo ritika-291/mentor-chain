@@ -28,9 +28,21 @@ const Session = {
     },
 
     async listForMentor(mentorId, { limit = 50, offset = 0 } = {}) {
+        const limitVal = parseInt(limit, 10);
+        const offsetVal = parseInt(offset, 10);
         const [rows] = await db.execute(
-            'SELECT * FROM sessions WHERE mentor_id = ? ORDER BY start_time DESC LIMIT ? OFFSET ?',
-            [mentorId, parseInt(limit, 10), parseInt(offset, 10)]
+            `SELECT * FROM sessions WHERE mentor_id = ? ORDER BY start_time DESC LIMIT ${limitVal} OFFSET ${offsetVal}`,
+            [mentorId]
+        );
+        return rows;
+    },
+
+    async listForMentee(menteeId, { limit = 50, offset = 0 } = {}) {
+        const limitVal = parseInt(limit, 10);
+        const offsetVal = parseInt(offset, 10);
+        const [rows] = await db.execute(
+            `SELECT * FROM sessions WHERE mentee_id = ? ORDER BY start_time DESC LIMIT ${limitVal} OFFSET ${offsetVal}`,
+            [menteeId]
         );
         return rows;
     }

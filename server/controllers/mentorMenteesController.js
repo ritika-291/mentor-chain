@@ -2,6 +2,7 @@ import MentorMentees from '../models/mentorMenteesModel.js';
 import User from '../models/userModel.js';
 import sendEmail from '../utils/emailUtils.js';
 import Notification from '../models/notificationModel.js';
+import Conversation from '../models/conversationModel.js';
 
 const mentorMenteesController = {
     // Mentor views list of their mentees
@@ -14,11 +15,13 @@ const mentorMenteesController = {
             if (!req.user || req.user.id !== mentorId) return res.status(403).json({ message: 'Forbidden' });
 
             const { limit = 50, offset = 0 } = req.query;
+            console.log(`[DEBUG] Listing mentees for mentorId: ${mentorId}, Limit: ${limit}, Offset: ${offset}`);
             const mentees = await MentorMentees.listMentees(mentorId, { limit, offset });
+            console.log(`[DEBUG] Found ${mentees.length} mentees`);
             res.json({ mentees });
         } catch (err) {
             console.error('Error listing mentees:', err);
-            res.status(500).json({ message: 'Server error' });
+            res.status(500).json({ message: 'Server error', error: err.message });
         }
     },
 
@@ -29,12 +32,22 @@ const mentorMenteesController = {
             if (isNaN(mentorId)) return res.status(400).json({ message: 'Invalid mentor id' });
 
             // If requester is mentee, create a request for themselves
-            if (req.user.role === 'mentee') {
+            if (req.user.role.toLowerCase() === 'mentee') {
                 const menteeId = req.user.id;
                 const existing = await MentorMentees.getRelationship(mentorId, menteeId);
-                if (existing) return res.status(400).json({ message: 'Relationship already exists' });
 
-                await MentorMentees.createRelationship(mentorId, menteeId, 'requested');
+                if (existing) {
+                    if (existing.status === 'active') {
+                        return res.status(400).json({ message: 'You are already connected with this mentor.', status: existing.status });
+                    } else if (existing.status === 'requested') {
+                        return res.status(400).json({ message: 'Request already pending.', status: existing.status });
+                    } else {
+                        // Status is 'rejected' or 'inactive', allow re-request
+                        await MentorMentees.reRequestRelationship(mentorId, menteeId);
+                    }
+                } else {
+                    await MentorMentees.createRelationship(mentorId, menteeId, 'requested');
+                }
 
                 // Fetch mentor and mentee info to notify
                 const mentorUser = await User.findUserById(mentorId);
@@ -61,7 +74,7 @@ const mentorMenteesController = {
                     }
                 }
 
-                return res.status(201).json({ message: 'Request created' });
+                return res.status(201).json({ message: 'Request created', status: 'requested' });
             }
 
             // If requester is mentor, they can add a mentee directly by passing menteeId in body
@@ -69,7 +82,7 @@ const mentorMenteesController = {
                 const { menteeId } = req.body;
                 if (!menteeId) return res.status(400).json({ message: 'menteeId required' });
                 const user = await User.findUserById(menteeId);
-                if (!user || user.role !== 'mentee') return res.status(400).json({ message: 'Invalid mentee id' });
+                if (!user || user.role.toLowerCase() !== 'mentee') return res.status(400).json({ message: 'Invalid mentee id' });
                 const existing = await MentorMentees.getRelationship(mentorId, menteeId);
                 if (existing) return res.status(400).json({ message: 'Relationship already exists' });
                 await MentorMentees.createRelationship(mentorId, menteeId, 'active');
@@ -79,6 +92,30 @@ const mentorMenteesController = {
             return res.status(403).json({ message: 'Forbidden' });
         } catch (err) {
             console.error('Error requesting/adding mentee:', err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
+    // Check relationship status (for mentee to see if they requested/connected)
+    async checkStatus(req, res) {
+        try {
+            const mentorId = parseInt(req.params.mentorId, 10);
+            if (isNaN(mentorId)) return res.status(400).json({ message: 'Invalid mentor id' });
+
+            if (!req.user || req.user.role.toLowerCase() !== 'mentee') {
+                return res.status(403).json({ message: 'Forbidden: Only mentees can check status' });
+            }
+
+            const menteeId = req.user.id;
+            const relationship = await MentorMentees.getRelationship(mentorId, menteeId);
+
+            if (relationship) {
+                return res.json({ status: relationship.status });
+            } else {
+                return res.json({ status: 'none' });
+            }
+        } catch (err) {
+            console.error('Error checking status:', err);
             res.status(500).json({ message: 'Server error' });
         }
     },
@@ -93,12 +130,22 @@ const mentorMenteesController = {
             if (!req.user || req.user.id !== mentorId) return res.status(403).json({ message: 'Forbidden' });
 
             const { status } = req.body;
-            if (!['requested','active','inactive'].includes(status)) return res.status(400).json({ message: 'Invalid status' });
+            if (!['requested', 'active', 'inactive'].includes(status)) return res.status(400).json({ message: 'Invalid status' });
 
             const existing = await MentorMentees.getRelationship(mentorId, menteeId);
             if (!existing) return res.status(404).json({ message: 'Relationship not found' });
 
             await MentorMentees.updateStatus(mentorId, menteeId, status);
+
+            // If status is 'active', ensure a conversation exists
+            if (status === 'active') {
+                const existingConv = await Conversation.findConversationBetween(mentorId, menteeId);
+                if (!existingConv) {
+                    await Conversation.createConversation([mentorId, menteeId]);
+                    console.log(`[Message] Conversation created for mentor ${mentorId} and mentee ${menteeId}`);
+                }
+            }
+
             res.json({ message: 'Status updated' });
         } catch (err) {
             console.error('Error updating mentee status:', err);

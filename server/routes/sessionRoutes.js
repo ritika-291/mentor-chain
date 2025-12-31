@@ -11,8 +11,14 @@ const router = express.Router();
 // Mentee requests a session
 router.post('/', authenticate, requireRole('mentee'), sessionController.requestSession);
 
+// Mentor schedules a session
+router.post('/schedule', authenticate, requireRole('mentor'), sessionController.scheduleSession);
+
 // Mentor: list their sessions
 router.get('/mentor/:mentorId', authenticate, requireRole('mentor'), sessionController.listForMentor);
+
+// Mentee: list their sessions
+router.get('/mentee/:menteeId', authenticate, requireRole('mentee'), sessionController.listForMentee);
 
 // Update session status (mentor only)
 router.patch('/:sessionId/status', authenticate, requireRole('mentor'), sessionController.updateStatus);

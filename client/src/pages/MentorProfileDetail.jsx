@@ -8,11 +8,19 @@ const MentorProfileDetail = () => {
   const [mentor, setMentor] = useState(null);
 
   const [loading, setLoading] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState('none'); // 'none', 'requested', 'active'
+  const [connectLoading, setConnectLoading] = useState(false);
 
   useEffect(() => {
     const fetchMentor = async () => {
       setLoading(true);
-      console.log("Fetching profile for mentorId:", mentorId);
+
+      // Determine user role and ID
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const isMentee = user && user.role === 'mentee';
+      const token = localStorage.getItem('token');
+
 
       // Check if it's a real mentor (based on ID prefix)
       if (typeof mentorId === 'string' && mentorId.startsWith('real-')) {
@@ -54,10 +62,65 @@ const MentorProfileDetail = () => {
         setMentor(foundMentor);
       }
       setLoading(false);
+
+      // Fetch connection status if mentee
+      if (isMentee && mentorId.startsWith('real-')) {
+        const realId = mentorId.replace('real-', '');
+        try {
+          const res = await fetch(`http://localhost:5000/api/mentors/${realId}/mentees/status`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setConnectionStatus(data.status || 'none');
+          }
+        } catch (err) {
+          console.error("Error fetching connection status:", err);
+        }
+      }
     };
 
     fetchMentor();
   }, [mentorId]);
+
+  const handleConnect = async () => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      alert("Please login to connect.");
+      return;
+    }
+    const token = localStorage.getItem('token');
+    if (!mentorId.startsWith('real-')) {
+      alert("Cannot connect to demo mentors. Please choose a real mentor.");
+      return;
+    }
+
+    const realId = mentorId.replace('real-', '');
+    setConnectLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/mentors/${realId}/mentees`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setConnectionStatus('requested');
+        // toast.success("Request sent!"); // Access toaster if available
+        alert("Connection request sent successfully!");
+      } else {
+        alert(data.message || "Failed to send request.");
+      }
+    } catch (err) {
+      console.error("Connection error:", err);
+      alert("Error sending request.");
+    } finally {
+      setConnectLoading(false);
+    }
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -104,9 +167,39 @@ const MentorProfileDetail = () => {
         {/* Booking Section - Placeholder */}
         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
           <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">Book a Session</h3>
-          <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg text-lg hover:bg-indigo-700 transition duration-300">
-            Schedule a Session with {mentor.name}
-          </button>
+          <div className="flex gap-4">
+            <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg text-lg hover:bg-indigo-700 transition duration-300">
+              Schedule a Session with {mentor.name}
+            </button>
+
+            {/* Connect / Contact Button */}
+            <div className="mt-8 flex justify-center">
+              {connectionStatus === 'active' ? (
+                <a
+                  href={`mailto:${mentor.email}`}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105"
+                >
+                  Contact via Email ✉️
+                </a>
+              ) : connectionStatus === 'requested' ? (
+                <button
+                  disabled
+                  className="bg-gray-400 text-white font-bold py-3 px-8 rounded-full shadow-lg cursor-not-allowed"
+                >
+                  Request Sent 🕒
+                </button>
+              ) : (
+                <button
+                  onClick={handleConnect}
+                  disabled={connectLoading}
+                  className={`${connectLoading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+                    } text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105`}
+                >
+                  {connectLoading ? 'Sending...' : 'Connect with Mentor 🚀'}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

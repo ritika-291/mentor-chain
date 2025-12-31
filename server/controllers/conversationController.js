@@ -6,6 +6,13 @@ const ConversationController = {
         try {
             const { participantIds } = req.body; // array of user ids
             if (!Array.isArray(participantIds) || participantIds.length < 2) return res.status(400).json({ message: 'participantIds must be an array of at least 2 user ids' });
+
+            // Check if conversation exists
+            const existing = await Conversation.findConversationBetween(participantIds[0], participantIds[1]);
+            if (existing) {
+                return res.status(200).json(existing);
+            }
+
             const convo = await Conversation.createConversation(participantIds);
             return res.status(201).json(convo);
         } catch (err) {

@@ -26,15 +26,16 @@ const authController = {
             const hashedPassword = await bcrypt.hash(password, salt);
 
             // Create user
-            const newUser = await User.createUser({ username, email, password: hashedPassword, role });
+            const lowerRole = role.toLowerCase();
+            const newUser = await User.createUser({ username, email, password: hashedPassword, role: lowerRole });
 
             // If mentee, update goals if provided
-            if ((role === 'mentee' || role === 'Mentee') && goals) {
+            if (lowerRole === 'mentee' && goals) {
                 await User.updateUser(newUser.insertId, { goals });
             }
 
             // If role is mentor, create an initial empty mentor profile
-            if (role === 'mentor') {
+            if (lowerRole === 'mentor') {
                 try {
                     const Mentor = (await import('../models/mentorModel.js')).default;
                     await Mentor.upsertProfile(newUser.insertId, {
@@ -47,14 +48,14 @@ const authController = {
             }
 
             // Generate JWT
-            const token = jwt.sign({ id: newUser.insertId, role: role }, JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ id: newUser.insertId, role: lowerRole }, JWT_SECRET, { expiresIn: '1h' });
 
             console.log('JWT_SECRET used:', JWT_SECRET); // Added log to check JWT_SECRET value
             console.log('Sending successful registration response to frontend.'); // Added log
             res.status(201).json({
                 message: 'User registered successfully',
                 token,
-                user: { id: newUser.insertId, username, email, role }
+                user: { id: newUser.insertId, username, email, role: lowerRole }
             });
 
         } catch (error) {
@@ -80,7 +81,7 @@ const authController = {
             }
 
             // --- NEW: Role check ---
-            if (user.role !== role) {
+            if (user.role.toLowerCase() !== role.toLowerCase()) {
                 return res.status(403).json({ message: `Access denied. You are registered as a ${user.role}.` });
             }
             // --- END NEW: Role check ---

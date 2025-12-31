@@ -32,6 +32,9 @@ router.get('/:mentorId/mentees', authenticate, requireRole('mentor'), mentorMent
 // Mentee requests connection to mentor OR mentor adds mentee directly
 router.post('/:mentorId/mentees', authenticate, mentorMenteesController.requestOrAdd);
 
+// Mentee checks status with mentor
+router.get('/:mentorId/mentees/status', authenticate, mentorMenteesController.checkStatus);
+
 // Mentor accepts/rejects or updates status
 router.patch('/:mentorId/mentees/:menteeId', authenticate, requireRole('mentor'), mentorMenteesController.updateStatus);
 
@@ -48,8 +51,8 @@ router.put('/:mentorId/availability', authenticate, requireRole('mentor'), avail
 router.post('/:mentorId/calendar/connect', authenticate, requireRole('mentor'), calendarController.connect);
 
 // Google OAuth helpers
-router.get('/:mentorId/calendar/connect/url', authenticate, requireRole('mentor'), (req, res, next) => import('../controllers/calendarOAuthController.js').then(mod => mod.default.getAuthUrl(req,res,next)).catch(next));
+router.get('/:mentorId/calendar/connect/url', authenticate, requireRole('mentor'), (req, res, next) => import('../controllers/calendarOAuthController.js').then(mod => mod.default.getAuthUrl(req, res, next)).catch(next));
 // OAuth callback endpoint (public)
-router.get('/calendar/oauth/callback', (req, res, next) => import('../controllers/calendarOAuthController.js').then(mod => mod.default.oauthCallback(req,res,next)).catch(next));
+router.get('/calendar/oauth/callback', (req, res, next) => import('../controllers/calendarOAuthController.js').then(mod => mod.default.oauthCallback(req, res, next)).catch(next));
 
 export default router;
