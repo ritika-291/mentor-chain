@@ -14,10 +14,11 @@ const Overview = () => {
   const [sessions, setSessions] = useState([]);
 
   // Stats State
+  // Stats State
   const [stats, setStats] = useState([
-    { title: 'Active Mentees', value: '0', color: 'text-indigo-600 dark:text-indigo-400', icon: '🧑‍💻' },
-    { title: 'Pending Requests', value: '0', color: 'text-yellow-600 dark:text-yellow-400', icon: '⏳' },
-    { title: 'Average Rating', value: '4.8 ⭐', color: 'text-green-600 dark:text-green-400', icon: '✨' },
+    { title: 'Active Mentees', value: '0', color: 'text-teal-400', icon: '🧑‍💻' },
+    { title: 'Pending Requests', value: '0', color: 'text-yellow-400', icon: '⏳' },
+    { title: 'Average Rating', value: '4.8 ⭐', color: 'text-green-400', icon: '✨' },
   ]);
 
   const userStr = localStorage.getItem('user');
@@ -118,7 +119,7 @@ const Overview = () => {
     <div className="space-y-8 p-4 sm:p-0">
 
       {/* Page Title */}
-      <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+      <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm mb-6">
         Dashboard Overview
       </h1>
 
@@ -127,13 +128,13 @@ const Overview = () => {
         {stats.map((stat) => (
           <div
             key={stat.title}
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl transition duration-300 hover:shadow-2xl border border-gray-100 dark:border-gray-700"
+            className="bg-gray-800 p-6 rounded-xl shadow-lg transition duration-300 hover:shadow-2xl border border-gray-700 hover:border-teal-500/30"
           >
             <div className="flex justify-between items-start">
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">{stat.title}</h3>
-              <span className="text-2xl">{stat.icon}</span>
+              <h3 className="text-lg font-semibold text-gray-300">{stat.title}</h3>
+              <span className="text-2xl opacity-80">{stat.icon}</span>
             </div>
-            <p className={`mt-2 text-5xl font-bold ${stat.color}`}>
+            <p className={`mt-2 text-5xl font-bold ${stat.color} drop-shadow-md`}>
               {stat.value}
             </p>
           </div>
@@ -148,9 +149,9 @@ const Overview = () => {
           <MenteesCard mentees={activeMentees} />
 
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Recent Requests</h2>
+            <h2 className="text-2xl font-bold text-white">Recent Requests</h2>
             {pendingRequests.length === 0 ? (
-              <p className="text-gray-500 bg-white dark:bg-gray-800 p-6 rounded-xl shadow">No pending requests.</p>
+              <p className="text-gray-400 bg-gray-800 p-6 rounded-xl shadow border border-gray-700">No pending requests.</p>
             ) : (
               pendingRequests.map(req => (
                 <RequestCard

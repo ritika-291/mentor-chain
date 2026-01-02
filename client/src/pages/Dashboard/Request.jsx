@@ -91,12 +91,12 @@ const Requests = () => {
     <div className="space-y-8 p-4 sm:p-0">
 
       {/* Page Header */}
-      <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+      <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
         📧 Mentorship Requests
       </h1>
 
       {/* --- Pending Requests Section --- */}
-      <h2 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 border-b pb-2 border-gray-200 dark:border-gray-700">
+      <h2 className="text-3xl font-bold text-teal-400 border-b pb-2 border-gray-700">
         Pending ( {pendingRequests.length} )
       </h2>
 
@@ -112,11 +112,11 @@ const Requests = () => {
           ))}
         </div>
       ) : (
-        <div className="p-8 text-center bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-          <p className="text-xl font-medium text-gray-600 dark:text-gray-300">
+        <div className="p-8 text-center bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+          <p className="text-xl font-medium text-gray-300">
             🎉 Great job! You currently have no pending mentorship requests.
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-400 mt-2">
             New requests will appear here when mentees seek your expertise.
           </p>
         </div>
@@ -124,15 +124,15 @@ const Requests = () => {
 
       {/* --- Past Requests/Archive (Optional) --- */}
       <div className="pt-6">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 border-b pb-2 border-gray-200 dark:border-gray-700">
+        <h2 className="text-2xl font-bold text-white border-b pb-2 border-gray-700">
           Archived/Past Requests
         </h2>
-        <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
-          <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+        <div className="mt-4 bg-gray-800 p-4 rounded-xl shadow-md border border-gray-700">
+          <ul className="divide-y divide-gray-700">
             {pastRequests.map(item => (
-              <li key={item.mentee_id} className="flex justify-between items-center py-3 text-gray-700 dark:text-gray-300 text-sm">
-                <span>Request from **{item.name || 'User'}**</span>
-                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+              <li key={item.mentee_id} className="flex justify-between items-center py-3 text-gray-300 text-sm">
+                <span>Request from <strong className="text-teal-400">{item.name || 'User'}</strong></span>
+                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === 'active' ? 'bg-green-900/40 text-green-300' : 'bg-red-900/40 text-red-300'
                   }`}>
                   {item.status} ({new Date(item.created_at || Date.now()).toLocaleDateString()})
                 </span>

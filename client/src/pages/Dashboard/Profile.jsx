@@ -210,37 +210,37 @@ const Profile = () => {
 
   return (
     <div className="space-y-8 p-4 sm:p-0">
-      <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+      <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
         👤 Profile Settings
       </h1>
 
       {message && (
-        <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">
+        <div className="p-4 bg-green-900/40 border border-green-800 rounded-lg text-green-300 shadow-md">
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400">
+        <div className="p-4 bg-red-900/40 border border-red-800 rounded-lg text-red-300 shadow-md">
           {error}
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+        <h2 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700">
           Personal Information
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Picture Upload */}
-          <div className="flex items-center space-x-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center space-x-6 pb-4 border-b border-gray-700">
             <img
-              className="h-24 w-24 rounded-full object-cover ring-4 ring-indigo-300 dark:ring-indigo-600 shadow-lg"
+              className="h-24 w-24 rounded-full object-cover ring-4 ring-teal-600 shadow-lg"
               src={avatarUrl || 'https://via.placeholder.com/150'}
               alt="Current Profile"
             />
             <div>
-              <label htmlFor="file-upload" className="cursor-pointer inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+              <label htmlFor="file-upload" className="cursor-pointer inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-teal-600 hover:bg-teal-700 transition-colors duration-150">
                 Change Picture
               </label>
               <input
@@ -251,7 +251,7 @@ const Profile = () => {
                 onChange={handleFileChange}
                 className="sr-only"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-400">
                 PNG, JPG, up to 5MB.
               </p>
             </div>
@@ -259,7 +259,7 @@ const Profile = () => {
 
           {/* Form Fields */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
               Full Name
             </label>
             <input
@@ -267,13 +267,13 @@ const Profile = () => {
               id="name"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
               Email Address
             </label>
             <input
@@ -281,12 +281,12 @@ const Profile = () => {
               id="email"
               value={profile?.email || ''}
               readOnly
-              className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-gray-100 dark:bg-gray-700 dark:text-white cursor-not-allowed"
+              className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm bg-gray-600 text-gray-300 cursor-not-allowed"
             />
           </div>
 
           <div>
-            <label htmlFor="expertise" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="expertise" className="block text-sm font-medium text-gray-300 mb-1">
               Expertise (comma-separated)
             </label>
             <input
@@ -295,12 +295,12 @@ const Profile = () => {
               value={expertise}
               onChange={(e) => setExpertise(e.target.value)}
               placeholder="e.g., Full-Stack Development, React, Node.js"
-              className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
 
           <div>
-            <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-300 mb-1">
               Hourly Rate ($)
             </label>
             <input
@@ -311,12 +311,12 @@ const Profile = () => {
               step="0.01"
               min="0"
               placeholder="e.g., 50.00"
-              className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
             />
           </div>
 
           <div>
-            <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-1">
               Bio / Introduction
             </label>
             <textarea
@@ -324,19 +324,19 @@ const Profile = () => {
               rows="4"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
             ></textarea>
           </div>
 
           {/* Availability/Schedule Link */}
-          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="pt-4 border-t border-gray-700">
+            <label className="block text-lg font-medium text-white mb-2">
               Availability
             </label>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <p className="text-sm text-gray-400 mb-3">
               Manage and update your mentorship schedule and available hours.
             </p>
-            <a href="/mentor/schedule" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 font-medium transition duration-150">
+            <a href="/mentor/schedule" className="inline-flex items-center text-teal-400 hover:text-teal-300 font-medium transition duration-150">
               Go to Schedule Management &rarr;
             </a>
           </div>
@@ -346,7 +346,7 @@ const Profile = () => {
             <button
               type="submit"
               disabled={saving}
-              className="w-full py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 border border-transparent rounded-xl shadow-xl text-lg font-bold text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Saving...' : 'Save Profile Changes'}
             </button>
@@ -354,14 +354,14 @@ const Profile = () => {
         </form>
 
         {/* Section: Security and Password */}
-        <div className="pt-8 mt-8 border-t border-gray-100 dark:border-gray-700">
-          <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">
+        <div className="pt-8 mt-8 border-t border-gray-700">
+          <h3 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700">
             Security
           </h3>
 
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div>
-              <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="current-password" className="block text-sm font-medium text-gray-300 mb-1">
                 Current Password
               </label>
               <input
@@ -370,12 +370,12 @@ const Profile = () => {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
-                className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="new-password" className="block text-sm font-medium text-gray-300 mb-1">
                   New Password
                 </label>
                 <input
@@ -384,11 +384,11 @@ const Profile = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
-                  className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
                 />
               </div>
               <div>
-                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-1">
                   Confirm New Password
                 </label>
                 <input
@@ -397,14 +397,14 @@ const Profile = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
                 />
               </div>
             </div>
             <div className="pt-4">
               <button
                 type="submit"
-                className="w-full py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all duration-150"
+                className="w-full py-3 px-4 border border-transparent rounded-xl shadow-xl text-lg font-bold text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-150"
               >
                 Change Password
               </button>

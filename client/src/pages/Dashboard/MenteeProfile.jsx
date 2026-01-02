@@ -263,39 +263,39 @@ const MenteeProfile = () => {
 
   return (
     <div className="space-y-8 p-4 md:p-0">
-      <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+      <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
         👤 My Profile
       </h1>
 
       {message && (
-        <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">
+        <div className="p-4 bg-green-900/40 border border-green-800 rounded-lg text-green-300 shadow-md">
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400">
+        <div className="p-4 bg-red-900/40 border border-red-800 rounded-lg text-red-300 shadow-md">
           {error}
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+        <h2 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700">
           Personal Information
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Picture Upload - Before Full Name */}
-          <div className="flex items-center space-x-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center space-x-6 pb-4 border-b border-gray-700">
             <div className="relative">
               <img
-                className="h-24 w-24 rounded-full object-cover ring-4 ring-indigo-300 dark:ring-indigo-600 shadow-lg"
+                className="h-24 w-24 rounded-full object-cover ring-4 ring-teal-600 shadow-lg"
                 src={avatarUrl || 'https://via.placeholder.com/150/6366f1/ffffff?text=M'}
                 alt="Current Profile"
               />
               <label
                 htmlFor="profile-picture-upload"
-                className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full cursor-pointer hover:bg-indigo-700 transition-colors shadow-lg"
+                className="absolute bottom-0 right-0 bg-teal-600 text-white p-2 rounded-full cursor-pointer hover:bg-teal-700 transition-colors shadow-lg"
                 title="Change Profile Picture"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -312,8 +312,8 @@ const MenteeProfile = () => {
               />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-sm font-medium text-white">Profile Picture</p>
+              <p className="mt-1 text-xs text-gray-400">
                 PNG, JPG, up to 5MB. Click the icon to change.
               </p>
             </div>
@@ -322,7 +322,7 @@ const MenteeProfile = () => {
           {/* Form Fields: Name and Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
                 Full Name
               </label>
               <input
@@ -330,13 +330,13 @@ const MenteeProfile = () => {
                 id="name"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
                 Email Address
               </label>
               <input
@@ -344,35 +344,35 @@ const MenteeProfile = () => {
                 id="email"
                 value={profile?.email || ''}
                 readOnly
-                className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-gray-100 dark:bg-gray-700 dark:text-white cursor-not-allowed"
+                className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm bg-gray-600 text-gray-300 cursor-not-allowed"
               />
             </div>
           </div>
 
           {/* Section: Learning Goals with Tags/Chips */}
-          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">
+          <div className="pt-4 border-t border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-3">
               Learning Goals
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-400 mb-4">
               Select your areas of interest and learning goals (click to add/remove)
             </p>
 
             {/* Selected Goals Display */}
             {selectedGoals.length > 0 && (
               <div className="mb-4">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Goals:</p>
+                <p className="text-sm font-medium text-gray-300 mb-2">Selected Goals:</p>
                 <div className="flex flex-wrap gap-2">
                   {selectedGoals.map((goal) => (
                     <span
                       key={goal}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-900/30 text-teal-300 border border-teal-800"
                     >
                       {goal}
                       <button
                         type="button"
                         onClick={() => toggleGoal(goal)}
-                        className="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200"
+                        className="ml-2 text-teal-500 hover:text-teal-300"
                       >
                         ×
                       </button>
@@ -390,8 +390,8 @@ const MenteeProfile = () => {
                   type="button"
                   onClick={() => toggleGoal(goal)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedGoals.includes(goal)
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-md'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                     }`}
                 >
                   {goal}
@@ -401,11 +401,11 @@ const MenteeProfile = () => {
           </div>
 
           {/* Submit Button for Profile */}
-          <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
+          <div className="pt-6 border-t border-gray-700">
             <button
               type="submit"
               disabled={saving}
-              className="w-full py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 border border-transparent rounded-xl shadow-xl text-lg font-bold text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Saving...' : 'Save Profile Changes'}
             </button>
@@ -413,14 +413,14 @@ const MenteeProfile = () => {
         </form>
 
         {/* Section: Security and Password */}
-        <div className="pt-8 mt-8 border-t border-gray-100 dark:border-gray-700">
-          <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">
+        <div className="pt-8 mt-8 border-t border-gray-700">
+          <h3 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700">
             Security
           </h3>
 
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div>
-              <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="current-password" className="block text-sm font-medium text-gray-300 mb-1">
                 Current Password
               </label>
               <input
@@ -429,12 +429,12 @@ const MenteeProfile = () => {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
-                className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="new-password" className="block text-sm font-medium text-gray-300 mb-1">
                   New Password
                 </label>
                 <input
@@ -443,11 +443,11 @@ const MenteeProfile = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
-                  className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
                 />
               </div>
               <div>
-                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-1">
                   Confirm New Password
                 </label>
                 <input
@@ -456,14 +456,14 @@ const MenteeProfile = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
                 />
               </div>
             </div>
             <div className="pt-4">
               <button
                 type="submit"
-                className="w-full py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all duration-150"
+                className="w-full py-3 px-4 border border-transparent rounded-xl shadow-xl text-lg font-medium text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-150"
               >
                 Change Password
               </button>

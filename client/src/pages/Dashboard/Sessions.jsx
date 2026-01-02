@@ -114,12 +114,12 @@ const Sessions = () => {
 
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between md:items-center">
-        <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
           🗓️ Mentorship Schedule
         </h1>
         <button
           onClick={() => setShowModal(true)}
-          className="mt-4 md:mt-0 py-3 px-6 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg flex items-center gap-2"
+          className="mt-4 md:mt-0 py-3 px-6 bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold rounded-xl hover:from-teal-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-teal-500/20 flex items-center gap-2"
         >
           <span>+</span> Schedule New Session
         </button>
@@ -130,13 +130,13 @@ const Sessions = () => {
 
         {/* Left Column (Sessions List) - Takes 2/3 space */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
-            <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4 border-b pb-3 border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700">
+            <h2 className="text-2xl font-bold text-white mb-4 border-b pb-3 border-gray-700">
               Upcoming Sessions
             </h2>
 
-            {loading ? <p>Loading...</p> : upcomingParams.length === 0 ? (
-              <div className="text-center py-10 text-gray-500">
+            {loading ? <p className="text-gray-400">Loading...</p> : upcomingParams.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 bg-gray-700/30 rounded-lg">
                 No upcoming sessions scheduled.
               </div>
             ) : (
@@ -147,19 +147,19 @@ const Sessions = () => {
                   const menteeName = mentees.find(m => m.mentee_id === session.mentee_id)?.name || mentees.find(m => m.mentee_id === session.mentee_id)?.username || `Mentee #${session.mentee_id}`;
 
                   return (
-                    <div key={session.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between border-l-4 border-indigo-500">
+                    <div key={session.id} className="p-4 bg-gray-700/50 hover:bg-gray-700 transition-colors rounded-lg flex flex-col sm:flex-row sm:items-center justify-between border-l-4 border-teal-500 shadow-sm">
                       <div>
-                        <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{menteeName}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-lg font-bold text-gray-100">{menteeName}</p>
+                        <p className="text-sm text-gray-400">
                           {new Date(session.start_time).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
-                        <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300">
+                        <p className="text-sm font-medium text-teal-400 cursor-pointer">
                           {new Date(session.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(session.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                       <div className="mt-2 sm:mt-0">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${session.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                          session.status === 'requested' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100'
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${session.status === 'accepted' ? 'bg-green-900/40 text-green-300 border border-green-800' :
+                          session.status === 'requested' ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-800' : 'bg-gray-600 text-gray-300'
                           }`}>
                           {session.status.toUpperCase()}
                         </span>
@@ -174,14 +174,14 @@ const Sessions = () => {
 
         {/* Right Column (Past/Stats or Simple Calendar View) */}
         <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 border-b pb-3 border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700">
+            <h2 className="text-2xl font-bold text-white mb-4 border-b pb-3 border-gray-700">
               Stats
             </h2>
             <div className="space-y-4">
-              <div className="bg-indigo-50 dark:bg-gray-700 p-4 rounded-lg text-center">
-                <p className="text-gray-500 dark:text-gray-300 text-sm">Total Sessions</p>
-                <p className="text-3xl font-bold text-indigo-600">{sessions.length}</p>
+              <div className="bg-gray-700 p-4 rounded-lg text-center border border-gray-600">
+                <p className="text-gray-400 text-sm">Total Sessions</p>
+                <p className="text-3xl font-bold text-teal-400">{sessions.length}</p>
               </div>
               {/* Can add more stats here */}
             </div>
@@ -191,20 +191,20 @@ const Sessions = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white">Schedule Session</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">&times;</button>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-700">
+            <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-800">
+              <h3 className="text-xl font-bold text-white">Schedule Session</h3>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white text-2xl">&times;</button>
             </div>
             <form onSubmit={handleSchedule} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Mentee</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Select Mentee</label>
                 <select
                   name="menteeId"
                   value={formData.menteeId}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-3 border rounded-lg bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-teal-500 outline-none"
                   required
                 >
                   <option value="">-- Select Mentee --</option>

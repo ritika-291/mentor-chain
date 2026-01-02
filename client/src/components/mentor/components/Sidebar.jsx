@@ -5,12 +5,14 @@ import { GiHamburgerMenu } from "react-icons/gi"; // Import the icon
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
   const navItems = [
-    { to:".", label:"Overview"}, // "." refers to the index route of the parent (/mentor)
-    { to:"sessions", label:"Sessions"},
-    { to:"request", label:"Request"},
-    { to:"messages", label:"Messages"},
-    { to:"profile", label:"Profile"},
-    { to:"settings", label:"Settings"},
+    { to: ".", label: "Overview" }, // "." refers to the index route of the parent (/mentor)
+    { to: "sessions", label: "Sessions" },
+    { to: "request", label: "Request" },
+    { to: "messages", label: "Messages" },
+    { to: "profile", label: "Profile" },
+    { to: "settings", label: "Settings" },
+    { to: "roadmaps", label: "Roadmaps" },
+    { to: "/community", label: "Community" },
   ];
 
 
@@ -24,19 +26,19 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         </button>
       </div>
       <nav>
-        {navItems.map((item)=>(
-          <NavLink 
-          key={item.to}
-          to={item.to}
-          end={item.to === "."} // Ensure 'Overview' is only active when exactly matching
-          className={({isActive})=> 
-            `block px-4 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === "."} // Ensure 'Overview' is only active when exactly matching
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 
               ${isActive ? 'bg-blue-600 text-white font-semibold' : ''}`
             }>
-              {item.label}
-            </NavLink>
+            {item.label}
+          </NavLink>
         ))}
-          
+
       </nav>
     </aside>
   )

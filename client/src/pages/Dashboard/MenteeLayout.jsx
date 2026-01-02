@@ -27,10 +27,10 @@ const MenteeLayout = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      
+    <div className="flex min-h-screen bg-gray-900 text-white">
+
       {/* 1. Sidebar - Fixed and responsive using translation for mobile */}
-      <div 
+      <div
         className={`fixed inset-y-0 left-0 z-30 transition-transform duration-300 ease-in-out w-64 md:translate-x-0
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
@@ -39,21 +39,21 @@ const MenteeLayout = () => {
       </div>
 
       {/* 2. Main Content Wrapper */}
-      <div 
+      <div
         className={`flex-1 flex flex-col transition-all duration-300 ease-in-out min-w-0 
         ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}`}
       >
-        
+
         {/* Navbar - Pass the toggle function here */}
         <MenteeNavbar toggleSidebar={toggleSidebar} />
-        
+
         {/* Main Area */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           {/* Outlet renders the specific page (Overview, Sessions, etc.) */}
           <Outlet />
         </main>
       </div>
-      
+
       {/* 3. Mobile Overlay - Closes sidebar on click */}
       {isSidebarOpen && (
         <div

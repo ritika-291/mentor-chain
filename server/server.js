@@ -47,6 +47,10 @@ app.use('/api/calendar', calendarRoutes);
 app.use('/api/conversations', conversationRoutes);
 import sessionRoutes from './routes/sessionRoutes.js';
 app.use('/api/sessions', sessionRoutes);
+import communityRoutes from './routes/communityRoutes.js';
+app.use('/api/community', communityRoutes);
+import roadmapRoutes from './routes/roadmapRoutes.js';
+app.use('/api/roadmaps', roadmapRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'MentorChain Backend API is running!' });

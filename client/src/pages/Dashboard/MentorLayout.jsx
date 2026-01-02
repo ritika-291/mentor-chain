@@ -26,7 +26,7 @@ const MentorLayout = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-900 text-white">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className={`flex-1 ${isSidebarOpen ? 'md:ml-64' : 'ml-0'} transition-all duration-300 flex flex-col`}> {/* Main content area as flex column */}
         <NavbarDashboard toggleSidebar={toggleSidebar} /> {/* Navbar needs toggle button */}

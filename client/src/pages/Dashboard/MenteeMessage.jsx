@@ -7,8 +7,8 @@ const MessageBubble = ({ message, currentUserId }) => {
 
   const alignmentClass = isSender ? 'self-end' : 'self-start';
   const colorClass = isSender
-    ? 'bg-indigo-600 text-white dark:bg-indigo-500' // Mentee (Sender)
-    : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'; // Mentor (Receiver)
+    ? 'bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-md' // Mentee (Sender)
+    : 'bg-gray-700 text-gray-200 shadow-sm border border-gray-600'; // Mentor (Receiver)
   const cornerClass = isSender
     ? 'rounded-br-none'
     : 'rounded-bl-none';
@@ -71,7 +71,6 @@ const MenteeMessage = () => {
           const allMentors = await res.json();
 
           // 2. Filter for connected ones
-          // We have to check status for each. This is expensive but correct for current API.
           const connectedMentors = [];
 
           // Use Promise.all for parallel fetching
@@ -84,20 +83,7 @@ const MenteeMessage = () => {
                 const statusData = await statusRes.json();
                 if (statusData.status === 'active') {
                   connectedMentors.push({
-                    id: mentor.id, // The USER ID of the mentor (assuming mentor.id is user_id from that endpoint? Likely yes as it's from user table)
-                    // Wait, /api/mentors usually returns mentor profiles.
-                    // Verify mentor structure. Usually `id` (profile id) and `user_id` (User ID).
-                    // Messages need USER ID.
-                    // Let's check Mentor structure quickly or assume user_id.
-                    // Actually, looking at MentorofMentee.jsx, it uses mentor.id for linking.
-                    // But Message needs User ID.
-                    // If /api/mentors returns joined data, it might have user_id.
-                    // Let's assume mentor.user_id exists. If not, we might be using profile ID which is wrong for conversation.
-                    // Most `listMentors` return the User object fields + profile fields.
-                    // Let's assume `mentor.id` IS the user id if the query is done right (User.findAllMentors).
-                    // ... checking mentorModel ...
-                    // It joins users u on mp.user_id = u.id. 'u.id, u.username...'. So `id` is user.id. Correct.
-
+                    id: mentor.id,
                     name: mentor.name || mentor.username || 'Mentor',
                     active: false
                   });
@@ -176,18 +162,18 @@ const MenteeMessage = () => {
 
   return (
     <div className="space-y-8 p-4 md:p-0">
-      <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+      <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
         💬 Messages
       </h1>
 
-      <div className="flex h-[75vh] bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div className="flex h-[75vh] bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
 
         {/* Left Column: Mentor List */}
-        <div className="w-full sm:w-1/3 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Your Mentors</h3>
+        <div className="w-full sm:w-1/3 border-r border-gray-700 overflow-y-auto bg-gray-800/50">
+          <div className="p-4 border-b border-gray-700">
+            <h3 className="text-xl font-semibold text-white">Your Mentors</h3>
           </div>
-          <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+          <ul className="divide-y divide-gray-700">
             {mentors.length === 0 ? (
               <li className="p-4 text-gray-500">No active mentors.</li>
             ) : (
@@ -195,11 +181,11 @@ const MenteeMessage = () => {
                 <li
                   key={mentor.id}
                   onClick={() => handleSelectUser(mentor)}
-                  className={`p-4 cursor-pointer transition-colors duration-150 ${activeChatUser?.id === mentor.id ? 'bg-indigo-50 dark:bg-indigo-900/40 border-l-4 border-indigo-600' : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  className={`p-4 cursor-pointer transition-colors duration-150 ${activeChatUser?.id === mentor.id ? 'bg-teal-900/30 border-l-4 border-teal-500' : 'hover:bg-gray-700'
                     }`}
                 >
                   <div className="flex justify-between items-center">
-                    <span className={`text-lg font-bold ${activeChatUser?.id === mentor.id ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>
+                    <span className={`text-lg font-bold ${activeChatUser?.id === mentor.id ? 'text-teal-400' : 'text-gray-200'}`}>
                       {mentor.name}
                     </span>
                   </div>
@@ -210,16 +196,16 @@ const MenteeMessage = () => {
         </div>
 
         {/* Right Column: Message Thread */}
-        <div className="w-full sm:w-2/3 flex flex-col">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+        <div className="w-full sm:w-2/3 flex flex-col bg-gray-900/30">
+          <div className="p-4 border-b border-gray-700 bg-gray-800">
+            <h3 className="text-xl font-bold text-white">
               {activeChatUser ? activeChatUser.name : 'Select a mentor'}
             </h3>
           </div>
 
-          <div className="flex-1 p-6 space-y-4 overflow-y-auto flex flex-col">
+          <div className="flex-1 p-6 space-y-4 overflow-y-auto flex flex-col scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
             {!activeChatUser ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-gray-500">
                 Select a mentor to chat with
               </div>
             ) : messages.length === 0 ? (
@@ -233,7 +219,7 @@ const MenteeMessage = () => {
           </div>
 
           {activeChatUser && (
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <div className="p-4 border-t border-gray-700 bg-gray-800">
               <div className="flex items-center space-x-3">
                 <input
                   type="text"
@@ -241,11 +227,11 @@ const MenteeMessage = () => {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder={`Message ${activeChatUser.name}...`}
-                  className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+                  className="flex-1 p-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-700 text-white placeholder-gray-400"
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-150">
+                  className="p-3 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-xl hover:from-teal-600 hover:to-blue-700 transition-all shadow-lg">
                   <svg className="w-6 h-6 transform -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                   </svg>

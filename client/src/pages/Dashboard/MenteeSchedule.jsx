@@ -77,26 +77,26 @@ const MenteeSchedule = () => {
 
   // Reusable Session Card Component
   const SessionCard = ({ session, type }) => (
-    <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 flex flex-col justify-between h-full border-l-4 border-indigo-500">
+    <div className="bg-gray-800 p-5 rounded-lg shadow-md border border-gray-700 flex flex-col justify-between h-full border-l-4 border-teal-500 hover:shadow-xl transition-shadow">
       <div>
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white truncate pr-2">{session.topic}</h3>
-          <span className={`text-xs px-2 py-1 rounded-full ${session.status === 'accepted' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          <h3 className="text-xl font-semibold text-white truncate pr-2">{session.topic}</h3>
+          <span className={`text-xs px-2 py-1 rounded-full font-bold ${session.status === 'accepted' ? 'bg-green-900/40 text-green-300 border border-green-800' : 'bg-gray-700 text-gray-300'
             }`}>
-            {session.status}
+            {session.status.toUpperCase()}
           </span>
         </div>
-        <p className="text-gray-600 dark:text-gray-400 mb-1"><span className="font-medium">Mentor:</span> {mentorsMap[session.mentorId] || `Mentor #${session.mentorId}`}</p>
-        <p className="text-gray-600 dark:text-gray-400"><span className="font-medium">Date:</span> {session.date} at {session.time}</p>
+        <p className="text-gray-400 mb-1"><span className="font-medium text-gray-300">Mentor:</span> {mentorsMap[session.mentorId] || `Mentor #${session.mentorId}`}</p>
+        <p className="text-gray-400"><span className="font-medium text-gray-300">Date:</span> {session.date} at {session.time}</p>
       </div>
       <div className="mt-4 flex justify-end">
         {type === 'upcoming' && (
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-150 text-sm">
+          <button className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-150 text-sm font-bold shadow-md">
             Join Meeting
           </button>
         )}
         {type === 'past' && (
-          <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors duration-150 text-sm">
+          <button className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors duration-150 text-sm font-medium">
             Feedback
           </button>
         )}
@@ -104,48 +104,114 @@ const MenteeSchedule = () => {
     </div>
   );
 
+  // Calendar Logic
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+  const handlePrevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  const handleNextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+
+  const renderCalendar = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDay = getFirstDayOfMonth(year, month);
+    const today = new Date();
+
+    const days = [];
+    // Empty slots for previous month
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="p-4 border border-gray-700 bg-gray-800/50"></div>);
+    }
+
+    // Days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = new Date(year, month, day).toLocaleDateString();
+      // Check for sessions on this day
+      const sessionsOnDay = upcomingSessions.filter(s => s.date === dateStr);
+      const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+
+      days.push(
+        <div key={day} className={`p-4 border border-gray-700 min-h-[100px] relative transition-colors hover:bg-gray-700/50 ${isToday ? 'bg-gray-700/80 ring-1 ring-teal-500' : 'bg-gray-800'}`}>
+          <span className={`text-sm font-bold ${isToday ? 'text-teal-400' : 'text-gray-400'}`}>{day}</span>
+          {sessionsOnDay.map((session, idx) => (
+            <div key={idx} className="mt-2 p-1 bg-teal-900/50 border border-teal-700/50 rounded text-xs text-teal-200 truncate" title={`${session.time} - ${session.topic}`}>
+              {session.time}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return days;
+  };
+
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
   return (
     <div className="space-y-8 p-4 md:p-0">
 
       {/* Page Header */}
-      <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white mb-4">
-        🗓️ My Sessions
-      </h1>
-      <p className="text-lg text-gray-600 dark:text-gray-400">
-        Manage your upcoming and past mentoring sessions.
-      </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 mb-2 drop-shadow-sm">
+            🗓️ My Schedule
+          </h1>
+          <p className="text-lg text-gray-400">
+            Manage your sessions with your mentors.
+          </p>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-lg flex items-center justify-between min-w-[300px]">
+          <button onClick={handlePrevMonth} className="text-gray-400 hover:text-white p-2 text-xl">‹</button>
+          <span className="text-xl font-bold text-white">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
+          <button onClick={handleNextMonth} className="text-gray-400 hover:text-white p-2 text-xl">›</button>
+        </div>
+      </div>
+
+      {/* --- Calendar Grid View --- */}
+      <section className="bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-700">
+        <div className="grid grid-cols-7 bg-gray-800 border-b border-gray-700">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+            <div key={d} className="p-4 text-center font-bold text-gray-400 uppercase text-xs tracking-wider">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {renderCalendar()}
+        </div>
+      </section>
 
       {/* --- Upcoming Sessions Section --- */}
-      <section className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">
-          Upcoming Sessions
+      <section className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+        <h2 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700 flex items-center">
+          <span className="mr-2">🚀</span> Upcoming Sessions
         </h2>
-        {loading ? <p>Loading...</p> : (
+        {loading ? <p className="text-gray-400">Loading...</p> : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {upcomingSessions.length > 0 ? (
               upcomingSessions.map(session => (
                 <SessionCard key={session.id} session={session} type="upcoming" />
               ))
             ) : (
-              <p className="text-gray-700 dark:text-gray-300 col-span-full text-center py-4">No upcoming sessions. Wait for your mentor to schedule one!</p>
+              <p className="text-gray-400 col-span-full text-center py-4 bg-gray-700/30 rounded-lg">No upcoming sessions. Schedule one with a mentor!</p>
             )}
           </div>
         )}
       </section>
 
       {/* --- Past Sessions Section --- */}
-      <section className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">
-          Past Sessions
+      <section className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+        <h2 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700 flex items-center">
+          <span className="mr-2">📜</span> Past Sessions
         </h2>
-        {loading ? <p>Loading...</p> : (
+        {loading ? <p className="text-gray-400">Loading...</p> : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pastSessions.length > 0 ? (
               pastSessions.map(session => (
                 <SessionCard key={session.id} session={session} type="past" />
               ))
             ) : (
-              <p className="text-gray-700 dark:text-gray-300 col-span-full text-center py-4">No past sessions to display.</p>
+              <p className="text-gray-500 col-span-full text-center py-4">No past sessions to display.</p>
             )}
           </div>
         )}

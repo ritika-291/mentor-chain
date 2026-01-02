@@ -55,8 +55,8 @@ const Mentor = {
         if (Array.isArray(q)) q = q.join(' ');
         if (q) {
             const like = `%${String(q)}%`;
-            where += ' AND (u.username LIKE ? OR mp.bio LIKE ?)';
-            params.push(like, like);
+            where += ' AND (u.username LIKE ? OR mp.bio LIKE ? OR mp.expertise LIKE ?)';
+            params.push(like, like, like);
         }
 
         // Ensure numeric limit/offset (not added to params to avoid prepared-statement issues)

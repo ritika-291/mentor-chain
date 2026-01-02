@@ -20,7 +20,7 @@ const workSteps = [
     description:
       "Use our smart search, filters, and recommendations to find the mentor who aligns with your goals.",
     buttonText: "SEARCH NOW",
-    link: "/mentee/mentors",
+    link: "/mentors",
     image: step2
   },
   {
@@ -29,7 +29,7 @@ const workSteps = [
     description:
       "Schedule sessions, chat, or meet virtually with someone who could change your life.",
     buttonText: "SEE TESTIMONIALS",
-    link:"/",
+    link: "/",
     image: step3
   }
 ];
