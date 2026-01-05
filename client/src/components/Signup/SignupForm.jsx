@@ -40,6 +40,7 @@ const SignupForm = ({ role }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log("DEBUG: Attempting Signup - Version 2 (Fetch Added)");
 
         try {
             const bodyData = {

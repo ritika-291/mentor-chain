@@ -18,8 +18,11 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME, // Use DB_NAME from .env
-    port: process.env.DB_PORT, // Critical for Aiven/Cloud DBs using non-standard ports
+    port: process.env.DB_PORT,
     multipleStatements: true,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 // Test the connection

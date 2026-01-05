@@ -21,6 +21,8 @@ const createDatabaseAndTables = async () => {
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
+            port: process.env.DB_PORT,
+            ssl: { rejectUnauthorized: false }
         });
 
         const dbName = process.env.DB_NAME;
@@ -37,6 +39,8 @@ const createDatabaseAndTables = async () => {
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: dbName,
+            port: process.env.DB_PORT,
+            ssl: { rejectUnauthorized: false },
             multipleStatements: true,
             waitForConnections: true,
             connectionLimit: 10,
@@ -236,10 +240,22 @@ const createDatabaseAndTables = async () => {
         console.log('Table \'session_notes\' checked/created successfully.');
 
         // Indexes to support analytics queries
-        await pool.execute(`CREATE INDEX IF NOT EXISTS idx_sessions_mentor_start_status ON sessions (mentor_id, start_time, status)`);
-        await pool.execute(`CREATE INDEX IF NOT EXISTS idx_mentor_mentees_mentor_status ON mentor_mentees (mentor_id, status)`);
-        await pool.execute(`CREATE INDEX IF NOT EXISTS idx_reviews_mentor_created_at ON reviews (mentor_id, created_at)`);
-        console.log('Indexes for analytics created/checked successfully.');
+        const createIndex = async (query) => {
+            try {
+                await pool.execute(query);
+                console.log(`Index created: ${query.split('ON')[1].trim()}`);
+            } catch (err) {
+                // 1061: Duplicate key name, 1050: Table exists (not relevant here but good safety)
+                if (err.errno !== 1061 && err.code !== 'ER_DUP_KEYNAME') {
+                    console.warn(`Warning creating index: ${err.message}`);
+                }
+            }
+        };
+
+        await createIndex(`CREATE INDEX idx_sessions_mentor_start_status ON sessions (mentor_id, start_time, status)`);
+        await createIndex(`CREATE INDEX idx_mentor_mentees_mentor_status ON mentor_mentees (mentor_id, status)`);
+        await createIndex(`CREATE INDEX idx_reviews_mentor_created_at ON reviews (mentor_id, created_at)`);
+        console.log('Indexes for analytics checked/created.');
 
         // Conversations and messages for real-time chat
         await pool.execute(`
