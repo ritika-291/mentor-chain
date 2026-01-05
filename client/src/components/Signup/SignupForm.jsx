@@ -55,6 +55,14 @@ const SignupForm = ({ role }) => {
             };
 
 
+            const response = await fetch(`${API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bodyData),
+            });
+
             console.log('Raw response from backend:', response); // Log the raw response
 
             const data = await response.json();
