@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Navbar from '../layout/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../config/api';
 
 const RoadmapBuilder = () => {
     const navigate = useNavigate();
@@ -32,7 +33,7 @@ const RoadmapBuilder = () => {
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch('http://localhost:5000/api/roadmaps', {
+            const res = await fetch(`${API_URL}/api/roadmaps`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

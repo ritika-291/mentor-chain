@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../../config/api';
 
 const MenteeProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -58,7 +59,7 @@ const MenteeProfile = () => {
           return;
         }
 
-        const response = await fetch('http://localhost:5000/api/profile/me', {
+        const response = await fetch(`${API_URL}/api/profile/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -73,7 +74,7 @@ const MenteeProfile = () => {
 
           // Initialize avatar URL if stored
           if (data.profile && data.profile.avatar_url) {
-            setAvatarUrl(`http://localhost:5000${data.profile.avatar_url}`);
+            setAvatarUrl(`${API_URL}${data.profile.avatar_url}`);
           }
 
           // Initialize selected goals if stored in backend
@@ -142,7 +143,7 @@ const MenteeProfile = () => {
         const formData = new FormData();
         formData.append('profilePicture', avatarFile);
 
-        const avatarResponse = await fetch('http://localhost:5000/api/profile/me/avatar', {
+        const avatarResponse = await fetch(`${API_URL}/api/profile/me/avatar`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -152,7 +153,7 @@ const MenteeProfile = () => {
 
         if (avatarResponse.ok) {
           const avatarData = await avatarResponse.json();
-          const newAvatarUrl = `http://localhost:5000${avatarData.avatar_url}`;
+          const newAvatarUrl = `${API_URL}${avatarData.avatar_url}`;
           setAvatarUrl(newAvatarUrl);
           setAvatarFile(null);
           // Store avatar URL in profile state for navbar access
@@ -169,7 +170,7 @@ const MenteeProfile = () => {
       }
 
       // Update profile data
-      const response = await fetch('http://localhost:5000/api/profile/me', {
+      const response = await fetch(`${API_URL}/api/profile/me`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -222,7 +223,7 @@ const MenteeProfile = () => {
 
     try {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:5000/api/auth/change-password', {
+      const response = await fetch(`${API_URL}/api/auth/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

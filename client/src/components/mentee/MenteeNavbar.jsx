@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/api";
 
 const MenteeNavbar = ({ toggleSidebar }) => {
   const [username, setUsername] = useState('Mentee');
@@ -24,7 +25,7 @@ const MenteeNavbar = ({ toggleSidebar }) => {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if (!token) return;
 
-        const response = await fetch('http://localhost:5000/api/profile/me', {
+        const response = await fetch(`${API_URL}/api/profile/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -37,7 +38,7 @@ const MenteeNavbar = ({ toggleSidebar }) => {
             setUsername(data.username);
           }
           if (data.profile && data.profile.avatar_url) {
-            setAvatarUrl(`http://localhost:5000${data.profile.avatar_url}`);
+            setAvatarUrl(`${API_URL}${data.profile.avatar_url}`);
           }
         }
       } catch (err) {

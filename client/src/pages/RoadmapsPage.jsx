@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../config/api';
 
 const RoadmapsPage = () => { // Generic listing for Mentors (Manage) and Mentees (Explore/My)
     const [roadmaps, setRoadmaps] = useState([]);
@@ -15,7 +16,7 @@ const RoadmapsPage = () => { // Generic listing for Mentors (Manage) and Mentees
 
     const fetchRoadmaps = async (userRole) => {
         const token = localStorage.getItem('token');
-        let url = 'http://localhost:5000/api/roadmaps'; // Default Public
+        let url = `${API_URL}/api/roadmaps`; // Default Public
 
         if (userRole === 'mentor') {
             // Fetch MY created roadmaps (endpoint logic in controller uses mentorId if filtered, or we can reuse `getMyRoadmaps` but that was for enrollment. 

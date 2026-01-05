@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Password from '../components/LoginCom/Password';
+import { API_URL } from '../config/api';
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -32,7 +33,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/reset-password/${token}`, {
+      const response = await fetch(`${API_URL}/api/auth/reset-password/${token}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const ResetPassword = () => {
 
       <div className="relative w-full max-w-md px-6 py-12 bg-gray-900/50 border border-gray-800 backdrop-blur-xl rounded-3xl shadow-2xl">
         <div className="flex flex-col items-center space-y-8">
-          
+
           {/* Header Section */}
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold tracking-tight text-white">
@@ -81,16 +82,16 @@ const ResetPassword = () => {
           {/* Form Section */}
           <form onSubmit={handleSubmit} className="w-full space-y-6">
             <div>
-              <Password 
-                value={password} 
+              <Password
+                value={password}
                 onChange={setPassword}
                 label="New Password"
               />
             </div>
 
             <div>
-              <Password 
-                value={confirmPassword} 
+              <Password
+                value={confirmPassword}
                 onChange={setConfirmPassword}
                 label="Confirm New Password"
               />

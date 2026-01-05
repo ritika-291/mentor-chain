@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
+import { API_URL } from '../../config/api';
 
 // Functional component to display a single message bubble
 const MessageBubble = ({ message, currentUserId }) => {
@@ -40,7 +41,7 @@ const Messages = () => {
 
   // 1. Initialize Socket
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
+    const newSocket = io(API_URL);
     setSocket(newSocket);
     // Cleanup
     return () => newSocket.close();
@@ -72,7 +73,7 @@ const Messages = () => {
       try {
         let endpoint = '';
         if (user.role === 'mentor') {
-          endpoint = `http://localhost:5000/api/mentors/${userId}/mentees`;
+          endpoint = `${API_URL}/api/mentors/${userId}/mentees`;
         } else {
           // If mentee, fetch their mentors.
           // We need a proper endpoint for "my mentors". 
@@ -82,9 +83,9 @@ const Messages = () => {
           // But we worked on `MentorofMentee.jsx` which used `fetchMentorsAndStatus`.
           // Ideally: GET /api/mentors/my-mentors (doesn't exist yet?)
           // Workaround: We will use the Mentor Dashboard logic for Mentors, and if Mentee...
-          // Wait, earlier we saw `MentorofMentee` fetching ALL mentors and checking status.
+          // Wait, earlier we saw `MentorofMentee.jsx` fetching ALL mentors and checking status.
           // That is expensive but workable.
-          endpoint = `http://localhost:5000/api/mentors`;
+          endpoint = `${API_URL}/api/mentors`;
         }
 
         const res = await fetch(endpoint, {
@@ -151,7 +152,7 @@ const Messages = () => {
 
     // 1. Get Conversation ID (Find or Create)
     try {
-      const res = await fetch('http://localhost:5000/api/conversations', {
+      const res = await fetch(`${API_URL}/api/conversations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +169,7 @@ const Messages = () => {
         socket.emit('join:conversation', { conversationId: convo.id });
 
         // 3. Fetch Messages
-        const msgRes = await fetch(`http://localhost:5000/api/conversations/${convo.id}/messages`, {
+        const msgRes = await fetch(`${API_URL}/api/conversations/${convo.id}/messages`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (msgRes.ok) {
@@ -190,7 +191,7 @@ const Messages = () => {
     if (!newMessage.trim() || !activeConversationId) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/conversations/${activeConversationId}/messages`, {
+      const res = await fetch(`${API_URL}/api/conversations/${activeConversationId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

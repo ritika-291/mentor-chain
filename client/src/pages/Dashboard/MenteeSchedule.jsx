@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { API_URL } from '../../config/api';
 
 const MenteeSchedule = () => {
   const [upcomingSessions, setUpcomingSessions] = useState([]);
@@ -15,7 +16,7 @@ const MenteeSchedule = () => {
     const fetchData = async () => {
       try {
         // 1. Fetch Mentors for Name Mapping
-        const mRes = await fetch('http://localhost:5000/api/mentors', {
+        const mRes = await fetch(`${API_URL}/api/mentors`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const nameMap = {};
@@ -30,7 +31,7 @@ const MenteeSchedule = () => {
         }
 
         // 2. Fetch Sessions
-        const sRes = await fetch(`http://localhost:5000/api/sessions/mentee/${menteeId}`, {
+        const sRes = await fetch(`${API_URL}/api/sessions/mentee/${menteeId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 

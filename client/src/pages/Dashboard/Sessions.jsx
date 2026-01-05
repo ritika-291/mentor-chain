@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { API_URL } from '../../config/api';
 
 const Sessions = () => {
   const [sessions, setSessions] = useState([]);
@@ -25,7 +26,7 @@ const Sessions = () => {
   const fetchData = async () => {
     try {
       // 1. Fetch Active Mentees
-      const mRes = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees`, {
+      const mRes = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (mRes.ok) {
@@ -35,7 +36,7 @@ const Sessions = () => {
       }
 
       // 2. Fetch Sessions
-      const sRes = await fetch(`http://localhost:5000/api/sessions/mentor/${mentorId}`, {
+      const sRes = await fetch(`${API_URL}/api/sessions/mentor/${mentorId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (sRes.ok) {
@@ -78,7 +79,7 @@ const Sessions = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/sessions/schedule', {
+      const res = await fetch(`${API_URL}/api/sessions/schedule`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

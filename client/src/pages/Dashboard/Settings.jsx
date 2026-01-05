@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { API_URL } from '../../config/api';
 
 const Settings = () => {
   // Dummy state for settings toggles
@@ -29,7 +30,7 @@ const Settings = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/auth/change-password', {
+      await axios.post(`${API_URL}/api/auth/change-password`, {
         oldPassword,
         newPassword
       }, {

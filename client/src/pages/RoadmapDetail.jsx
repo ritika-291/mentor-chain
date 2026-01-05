@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
+
 import { useParams } from 'react-router-dom';
+import { API_URL } from '../config/api';
 
 const RoadmapDetail = () => {
     const { id } = useParams();
@@ -16,19 +18,14 @@ const RoadmapDetail = () => {
 
     const fetchDetails = async () => {
         const token = localStorage.getItem('token');
-        try {
-            const res = await fetch(`http://localhost:5000/api/roadmaps/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setRoadmap(data);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
+        const res = await fetch(`${API_URL}/api/roadmaps/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setRoadmap(data);
         }
+        setLoading(false);
     };
 
     const toggleStep = async (stepId, currentStatus) => {
@@ -44,25 +41,21 @@ const RoadmapDetail = () => {
         }));
 
         const token = localStorage.getItem('token');
-        try {
-            await fetch(`http://localhost:5000/api/roadmaps/${id}/steps/${stepId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ completed: !currentStatus })
-            });
-        } catch (err) {
-            console.error(err);
-            // Revert on error?
-        }
+
+        await fetch(`${API_URL}/api/roadmaps/${id}/steps/${stepId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ completed: !currentStatus })
+        });
     };
 
     const handleEnroll = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`http://localhost:5000/api/roadmaps/${id}/enroll`, {
+            const res = await fetch(`${API_URL}/api/roadmaps/${id}/enroll`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

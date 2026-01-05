@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../../config/api';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -31,7 +32,7 @@ const Profile = () => {
           return;
         }
 
-        const response = await fetch('http://localhost:5000/api/profile/me', {
+        const response = await fetch(`${API_URL}/api/profile/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -50,7 +51,7 @@ const Profile = () => {
               : (data.profile.expertise || ''));
             setHourlyRate(data.profile.hourly_rate || '');
             setAvatarUrl(data.profile.avatar_url
-              ? `http://localhost:5000${data.profile.avatar_url}`
+              ? `${API_URL}${data.profile.avatar_url}`
               : '');
           }
         } else {
@@ -97,7 +98,7 @@ const Profile = () => {
         const formData = new FormData();
         formData.append('profilePicture', avatarFile);
 
-        const avatarResponse = await fetch('http://localhost:5000/api/profile/me/avatar', {
+        const avatarResponse = await fetch(`${API_URL}/api/profile/me/avatar`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -107,7 +108,7 @@ const Profile = () => {
 
         if (avatarResponse.ok) {
           const avatarData = await avatarResponse.json();
-          setAvatarUrl(`http://localhost:5000${avatarData.avatar_url}`);
+          setAvatarUrl(`${API_URL}${avatarData.avatar_url}`);
           setAvatarFile(null);
         } else {
           throw new Error('Failed to upload profile picture');
@@ -117,7 +118,7 @@ const Profile = () => {
       // Update profile data
       const expertiseArray = expertise ? expertise.split(',').map(e => e.trim()).filter(e => e) : [];
 
-      const response = await fetch('http://localhost:5000/api/profile/me', {
+      const response = await fetch(`${API_URL}/api/profile/me`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -169,7 +170,7 @@ const Profile = () => {
 
     try {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:5000/api/auth/change-password', {
+      const response = await fetch(`${API_URL}/api/auth/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

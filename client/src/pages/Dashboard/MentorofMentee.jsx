@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import MentorProfileCard from '../../components/cards/MentorProfileCard'; // Corrected path
 import mentorDetailsData from '../../data/MentorDetailsData'; // Using the imported JSON data
+import { API_URL } from '../../config/api';
 
 const Mentors = () => {
     // --- State for Search and Filtering ---
@@ -16,7 +17,7 @@ const Mentors = () => {
         const fetchMentorsAndStatus = async () => {
             try {
                 // 1. Fetch Mentors
-                const response = await fetch('http://localhost:5000/api/mentors');
+                const response = await fetch(`${API_URL}/api/mentors`);
                 if (response.ok) {
                     const realMentors = await response.json();
 
@@ -29,7 +30,7 @@ const Mentors = () => {
                         let status = 'none';
                         if (user && user.role === 'mentee' && token) {
                             try {
-                                const statusRes = await fetch(`http://localhost:5000/api/mentors/${m.id}/mentees/status`, {
+                                const statusRes = await fetch(`${API_URL}/api/mentors/${m.id}/mentees/status`, {
                                     headers: { 'Authorization': `Bearer ${token}` }
                                 });
                                 if (statusRes.ok) {

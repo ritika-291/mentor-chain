@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import { API_URL } from '../config/api';
 
 const CommunityPage = () => {
     const [posts, setPosts] = useState([]);
@@ -28,7 +29,7 @@ const CommunityPage = () => {
             return;
         }
         try {
-            const res = await fetch('http://localhost:5000/api/community', {
+            const res = await fetch(`${API_URL}/api/community`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -48,7 +49,7 @@ const CommunityPage = () => {
         if (!token || !newPost.trim()) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/community', {
+            const res = await fetch(`${API_URL}/api/community`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ const CommunityPage = () => {
         }));
 
         try {
-            const res = await fetch(`http://localhost:5000/api/community/${postId}/like`, {
+            const res = await fetch(`${API_URL}/api/community/${postId}/like`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -109,7 +110,7 @@ const CommunityPage = () => {
     const fetchComments = async (postId) => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`http://localhost:5000/api/community/${postId}/comments`, {
+            const res = await fetch(`${API_URL}/api/community/${postId}/comments`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -125,7 +126,7 @@ const CommunityPage = () => {
         if (!token || !newComment.trim()) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/community/${postId}/comment`, {
+            const res = await fetch(`${API_URL}/api/community/${postId}/comment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

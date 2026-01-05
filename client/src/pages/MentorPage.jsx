@@ -4,6 +4,8 @@ import SkeletonMentorCard from '../components/cards/SkeletonMentorCard';
 import mentorDetailsData from '../data/MentorDetailsData';
 import { useSearchParams } from 'react-router-dom';
 
+import { API_URL } from '../config/api';
+
 const MentorsPage = () => {
     // --- State for Search and Filtering ---
     const [searchParams] = useSearchParams();
@@ -22,7 +24,7 @@ const MentorsPage = () => {
                 // For better efficiency, you can pass ?q=searchTerm to the API if you want backend-only search
                 // But since we are MERGING with dummy data, let's fetch 'all' (or top 20) and then filter locally 
                 // to respect the mixed data requirement.
-                const res = await fetch('http://localhost:5000/api/mentors');
+                const res = await fetch(`${API_URL}/api/mentors`);
                 if (res.ok) {
                     const data = await res.json();
                     // Transform API data to match Card component props structure if needed

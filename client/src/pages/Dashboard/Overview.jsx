@@ -6,6 +6,7 @@ import MenteesCard from '../../components/mentor/components/MenteesCard'; // You
 import Calendar from '../../components/mentor/components/Calendar'; // Your original component name
 import RequestCard from '../../components/mentor/components/RequestCard';
 import toast from 'react-hot-toast';
+import { API_URL } from '../../config/api';
 
 const Overview = () => {
   const [activeMentees, setActiveMentees] = useState([]);
@@ -30,7 +31,7 @@ const Overview = () => {
     if (!mentorId) return;
     try {
       // 1. Fetch Mentees
-      const res = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees`, {
+      const res = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -52,7 +53,7 @@ const Overview = () => {
       }
 
       // 2. Fetch Sessions
-      const sRes = await fetch(`http://localhost:5000/api/sessions/mentor/${mentorId}`, {
+      const sRes = await fetch(`${API_URL}/api/sessions/mentor/${mentorId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (sRes.ok) {
@@ -74,7 +75,7 @@ const Overview = () => {
 
   const handleAccept = async (menteeId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees/${menteeId}`, {
+      const res = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees/${menteeId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ const Overview = () => {
 
   const handleReject = async (menteeId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees/${menteeId}`, {
+      const res = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees/${menteeId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

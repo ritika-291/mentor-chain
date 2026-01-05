@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import mentorDetailsData from '../data/MentorDetailsData';
+import { API_URL } from '../config/api';
 
 const MentorProfileDetail = () => {
   const { mentorId } = useParams();
@@ -58,7 +59,7 @@ const MentorProfileDetail = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/api/sessions', {
+      const res = await fetch(`${API_URL}/api/sessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,13 +96,12 @@ const MentorProfileDetail = () => {
       const isMentee = user && user.role === 'mentee';
       const token = localStorage.getItem('token');
 
-
       // Check if it's a real mentor (based on ID prefix)
       if (typeof mentorId === 'string' && mentorId.startsWith('real-')) {
         const realId = mentorId.replace('real-', '');
         try {
-          console.log(`Fetching from API: http://localhost:5000/api/mentors/${realId}/profile`);
-          const response = await fetch(`http://localhost:5000/api/mentors/${realId}/profile`);
+          console.log(`Fetching from API: ${API_URL}/api/mentors/${realId}/profile`);
+          const response = await fetch(`${API_URL}/api/mentors/${realId}/profile`);
 
           if (response.ok) {
             const data = await response.json();
@@ -109,15 +109,15 @@ const MentorProfileDetail = () => {
 
             // Handle potential missing profile object
             const profile = data.profile || {};
-            const user = data.user || {};
+            const userData = data.user || {};
 
             setMentor({
               id: mentorId,
-              name: user.username || 'Unknown Mentor',
+              name: userData.username || 'Unknown Mentor',
               title: profile.expertise && profile.expertise[0] ? `${profile.expertise[0]} Expert` : 'Mentor',
               expertise: profile.expertise || [],
               bio: profile.bio || "No bio available.",
-              image: profile.avatar_url ? `http://localhost:5000${profile.avatar_url}` : 'https://via.placeholder.com/150',
+              image: profile.avatar_url ? `${API_URL}${profile.avatar_url}` : 'https://via.placeholder.com/150',
               rating: profile.rating || 5.0,
               availability_status: profile.availability_status === 'available' ? 'High' : (profile.availability_status === 'busy' ? 'Low' : 'Medium'),
               reviews: profile.reviews_count || 0
@@ -141,7 +141,7 @@ const MentorProfileDetail = () => {
       if (isMentee && mentorId.startsWith('real-')) {
         const realId = mentorId.replace('real-', '');
         try {
-          const res = await fetch(`http://localhost:5000/api/mentors/${realId}/mentees/status`, {
+          const res = await fetch(`${API_URL}/api/mentors/${realId}/mentees/status`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {
@@ -171,8 +171,9 @@ const MentorProfileDetail = () => {
 
     const realId = mentorId.replace('real-', '');
     setConnectLoading(true);
+
     try {
-      const res = await fetch(`http://localhost:5000/api/mentors/${realId}/mentees`, {
+      const res = await fetch(`${API_URL}/api/mentors/${realId}/mentees`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -205,10 +206,8 @@ const MentorProfileDetail = () => {
       <div className="flex justify-center items-center h-screen text-xl text-gray-700 dark:text-gray-300">
         Mentor not found.
       </div>
-
     );
   }
-
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">

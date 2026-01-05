@@ -1,8 +1,7 @@
-// Requests.jsx
-
 import React, { useState, useEffect } from 'react';
 // Assuming RequestCard is the name of your styled component
 import RequestCard from '../../components/mentor/components/RequestCard';
+import { API_URL } from '../../config/api';
 
 const Requests = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -22,8 +21,9 @@ const Requests = () => {
   }, [mentorId]);
 
   const fetchRequests = async () => {
+
     try {
-      const res = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees`, {
+      const res = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -45,7 +45,7 @@ const Requests = () => {
 
   const handleAccept = async (menteeId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees/${menteeId}`, {
+      const res = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees/${menteeId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const Requests = () => {
   const handleReject = async (menteeId) => {
     if (!window.confirm("Are you sure you want to reject this request?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/mentors/${mentorId}/mentees/${menteeId}`, {
+      const res = await fetch(`${API_URL}/api/mentors/${mentorId}/mentees/${menteeId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,6 @@ const Requests = () => {
       console.error("Error rejecting:", err);
     }
   };
-
   return (
     <div className="space-y-8 p-4 sm:p-0">
 

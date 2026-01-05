@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../../config/api';
 
 const MenteeOverview = () => {
   const [stats, setStats] = useState([
@@ -22,7 +23,7 @@ const MenteeOverview = () => {
         // 1. Fetch Mentors & Calculate 'Matched'
         // Note: Currently no direct 'my-mentors' API that returns status cleanly without checking.
         // We fetch all available mentors and check status (expensive but accurate as per current implementation)
-        const mentorsRes = await fetch('http://localhost:5000/api/mentors', {
+        const mentorsRes = await fetch(`${API_URL}/api/mentors`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         let activeMentorCount = 0;
@@ -31,7 +32,7 @@ const MenteeOverview = () => {
           // Parallel status check
           const statusChecks = await Promise.all(allMentors.map(async m => {
             try {
-              const sRes = await fetch(`http://localhost:5000/api/mentors/${m.id}/mentees/status`, {
+              const sRes = await fetch(`${API_URL}/api/mentors/${m.id}/mentees/status`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
               if (sRes.ok) {
@@ -45,7 +46,7 @@ const MenteeOverview = () => {
         }
 
         // 2. Fetch Sessions
-        const sessionsRes = await fetch(`http://localhost:5000/api/sessions/mentee/${menteeId}`, {
+        const sessionsRes = await fetch(`${API_URL}/api/sessions/mentee/${menteeId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         let upcomingCount = 0;

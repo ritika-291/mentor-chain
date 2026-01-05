@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
+import { API_URL } from '../../config/api';
 
 const MessageBubble = ({ message, currentUserId }) => {
   const isSender = message.sender_id === currentUserId;
@@ -39,7 +40,7 @@ const MenteeMessage = () => {
 
   // Initialize Socket
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
+    const newSocket = io(API_URL);
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);
@@ -64,7 +65,7 @@ const MenteeMessage = () => {
     const fetchMyMentors = async () => {
       try {
         // 1. Fetch all mentors (Base list)
-        const res = await fetch('http://localhost:5000/api/mentors', {
+        const res = await fetch(`${API_URL}/api/mentors`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -76,7 +77,7 @@ const MenteeMessage = () => {
           // Use Promise.all for parallel fetching
           await Promise.all(allMentors.map(async (mentor) => {
             try {
-              const statusRes = await fetch(`http://localhost:5000/api/mentors/${mentor.id}/mentees/status`, {
+              const statusRes = await fetch(`${API_URL}/api/mentors/${mentor.id}/mentees/status`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
               if (statusRes.ok) {
@@ -108,7 +109,7 @@ const MenteeMessage = () => {
     setActiveChatUser(contact);
     try {
       // Find or create conversation
-      const res = await fetch('http://localhost:5000/api/conversations', {
+      const res = await fetch(`${API_URL}/api/conversations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +123,7 @@ const MenteeMessage = () => {
         setActiveConversationId(convo.id);
         socket.emit('join:conversation', { conversationId: convo.id });
 
-        const msgRes = await fetch(`http://localhost:5000/api/conversations/${convo.id}/messages`, {
+        const msgRes = await fetch(`${API_URL}/api/conversations/${convo.id}/messages`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (msgRes.ok) {
@@ -142,7 +143,7 @@ const MenteeMessage = () => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !activeConversationId) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/conversations/${activeConversationId}/messages`, {
+      const res = await fetch(`${API_URL}/api/conversations/${activeConversationId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

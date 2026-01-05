@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../config/api';
 
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
@@ -13,7 +14,7 @@ const NotificationsPage = () => {
     const fetchNotifications = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:5000/api/notifications', {
+            const res = await fetch(`${API_URL}/api/notifications`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -34,7 +35,7 @@ const NotificationsPage = () => {
 
             const token = localStorage.getItem('token');
             try {
-                await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+                await fetch(`${API_URL}/api/notifications/${id}/read`, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

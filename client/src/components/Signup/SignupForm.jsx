@@ -4,6 +4,7 @@ import MentorFields from '../Role/mentor/MentorField';
 import MenteeFields from '../Role/mentee/MenteeField';
 import Password from '../LoginCom/Password';
 import InputField from '../LoginCom/InputField';
+import { API_URL } from '../../config/api';
 
 const SignupForm = ({ role }) => {
     const [formData, setFormData] = useState({
@@ -53,13 +54,6 @@ const SignupForm = ({ role }) => {
                 goals: formData.goals ? formData.goals.split(',').map(g => g.trim()) : []
             };
 
-            const response = await fetch('http://localhost:5000/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(bodyData),
-            });
 
             console.log('Raw response from backend:', response); // Log the raw response
 
