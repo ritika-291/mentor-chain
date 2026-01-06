@@ -14,7 +14,7 @@ export const createPost = async (req, res) => {
         res.status(201).json({ message: 'Post created', postId });
     } catch (error) {
         console.error('Error creating post:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 };
 
@@ -51,7 +51,7 @@ export const likePost = async (req, res) => {
         res.json({ message: `Post ${status}`, status });
     } catch (error) {
         console.error('Error liking post:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 };
 
@@ -76,7 +76,7 @@ export const commentOnPost = async (req, res) => {
         res.json({ message: 'Comment added' });
     } catch (error) {
         console.error('Error commenting:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 };
 

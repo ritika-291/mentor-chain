@@ -12,7 +12,7 @@ const profileController = {
     async getProfile(req, res) {
         try {
             const userId = req.user.id;
-            
+
             // Get user data
             const user = await User.findUserById(userId);
             if (!user) {
@@ -33,7 +33,14 @@ const profileController = {
                 if (mentorProfile) {
                     profileData.profile = {
                         bio: mentorProfile.bio,
-                        expertise: mentorProfile.expertise ? (typeof mentorProfile.expertise === 'string' ? JSON.parse(mentorProfile.expertise) : mentorProfile.expertise) : [],
+                        expertise: (() => {
+                            if (Array.isArray(mentorProfile.expertise)) return mentorProfile.expertise;
+                            if (typeof mentorProfile.expertise === 'string') {
+                                try { return JSON.parse(mentorProfile.expertise); }
+                                catch (e) { return mentorProfile.expertise.split(',').map(s => s.trim()); }
+                            }
+                            return [];
+                        })(),
                         avatar_url: mentorProfile.avatar_url,
                         hourly_rate: mentorProfile.hourly_rate,
                         availability_status: mentorProfile.availability_status,
@@ -70,7 +77,7 @@ const profileController = {
             res.status(200).json(profileData);
         } catch (error) {
             console.error('Error getting profile:', error);
-            res.status(500).json({ message: 'Server error getting profile' });
+            res.status(500).json({ message: 'Server error getting profile: ' + error.message, stack: error.stack });
         }
     },
 
@@ -89,7 +96,7 @@ const profileController = {
             // Update user basic info
             const userUpdates = {};
             if (username) userUpdates.username = username;
-            
+
             // For mentees, handle goals
             if ((user.role === 'mentee' || user.role === 'Mentee') && goals !== undefined) {
                 console.log('Saving goals for mentee:', goals); // Debug log
@@ -126,7 +133,7 @@ const profileController = {
     async uploadProfilePicture(req, res) {
         try {
             const userId = req.user.id;
-            
+
             if (!req.file) {
                 return res.status(400).json({ message: 'No file uploaded' });
             }
@@ -165,9 +172,9 @@ const profileController = {
                 await User.updateUser(userId, { avatar_url: fileUrl });
             }
 
-            res.status(200).json({ 
+            res.status(200).json({
                 message: 'Profile picture uploaded successfully',
-                avatar_url: fileUrl 
+                avatar_url: fileUrl
             });
         } catch (error) {
             console.error('Error uploading profile picture:', error);

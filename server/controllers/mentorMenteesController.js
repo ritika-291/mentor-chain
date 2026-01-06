@@ -57,7 +57,7 @@ const mentorMenteesController = {
                 if (mentorUser) {
                     // Create in-app notification
                     try {
-                        await Notification.create(mentorId, 'mentee_request', { menteeId, menteeName });
+                        await Notification.create(mentorId, 'mentee_request', `New mentorship request from ${menteeName}`, menteeId);
                     } catch (notifErr) {
                         console.error('Failed to create DB notification:', notifErr);
                     }
@@ -149,7 +149,7 @@ const mentorMenteesController = {
             res.json({ message: 'Status updated' });
         } catch (err) {
             console.error('Error updating mentee status:', err);
-            res.status(500).json({ message: 'Server error' });
+            res.status(500).json({ message: 'Server error: ' + err.message, stack: err.stack });
         }
     },
 

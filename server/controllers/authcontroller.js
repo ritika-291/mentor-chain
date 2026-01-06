@@ -97,7 +97,7 @@ const authController = {
 
         } catch (error) {
             console.error('Error during login:', error);
-            res.status(500).json({ message: 'Server error during login' });
+            res.status(500).json({ message: 'Server error during login: ' + error.message });
         }
     },
 
