@@ -24,14 +24,15 @@ const Roadmap = {
     // --- Consumer (Mentee) Methods ---
 
     async assignToUser(userId, roadmapId) {
-        // Ignored if duplicate thanks to UNIQUE constraint, or use INSERT IGNORE
-        const sql = `INSERT IGNORE INTO user_roadmaps (user_id, roadmap_id, status) VALUES (?, ?, 'active')`;
+        // Ignored if duplicate thanks to UNIQUE constraint (if exists) or check first
+        // user_roadmaps (renamed from enrollments)
+        const sql = `INSERT INTO user_roadmaps (user_id, roadmap_id, status) VALUES (?, ?, 'active')`;
         await db.execute(sql, [userId, roadmapId]);
     },
 
     async getUserRoadmaps(userId) {
         const sql = `
-            SELECT r.*, ur.status as user_status, ur.assigned_at,
+            SELECT r.*, ur.status as user_status, ur.enrolled_at as assigned_at,
             (SELECT COUNT(*) FROM roadmap_steps rs WHERE rs.roadmap_id = r.id) as total_steps,
             (SELECT COUNT(*) FROM user_roadmap_progress urp 
              JOIN roadmap_steps rs ON urp.step_id = rs.id 
@@ -59,11 +60,17 @@ const Roadmap = {
 
     async getRoadmapDetails(roadmapId, userId = null) {
         // Get Basic Info
-        const [roadmap] = await db.query(`SELECT r.*, u.username as mentor_name FROM roadmaps r JOIN users u ON r.mentor_id = u.id WHERE r.id = ?`, [roadmapId]);
+        console.log(`[DEBUG] Fetching roadmap details for ID: ${roadmapId}`);
+        // Use LEFT JOIN for user incase user was deleted (though unlikely with FK)
+        const [roadmap] = await db.query(`SELECT r.*, u.username as mentor_name FROM roadmaps r LEFT JOIN users u ON r.mentor_id = u.id WHERE r.id = ?`, [roadmapId]);
+
+        console.log(`[DEBUG] Roadmap fetch result:`, roadmap);
+
         if (roadmap.length === 0) return null;
 
         // Get Steps
         const [steps] = await db.query(`SELECT * FROM roadmap_steps WHERE roadmap_id = ? ORDER BY order_index ASC`, [roadmapId]);
+        console.log(`[DEBUG] Steps found: ${steps.length}`);
 
         // If UserID provided, get progress
         let progressMap = {};
@@ -87,6 +94,22 @@ const Roadmap = {
             const sql = `UPDATE user_roadmap_progress SET completed = 0, completed_at = NULL WHERE user_id = ? AND step_id = ?`;
             await db.execute(sql, [userId, stepId]);
         }
+    },
+    async delete(roadmapId) {
+        // Delete roadmap (cascading deletes steps/enrollments via FK constraints typically, or manual)
+        // Assuming FK has ON DELETE CASCADE
+        const sql = `DELETE FROM roadmaps WHERE id = ?`;
+        await db.execute(sql, [roadmapId]);
+    },
+
+    async update(roadmapId, title, description) {
+        const sql = `UPDATE roadmaps SET title = ?, description = ? WHERE id = ?`;
+        await db.execute(sql, [title, description, roadmapId]);
+    },
+
+    async getOwner(roadmapId) {
+        const [rows] = await db.query('SELECT mentor_id FROM roadmaps WHERE id = ?', [roadmapId]);
+        return rows.length ? rows[0].mentor_id : null;
     }
 };
 

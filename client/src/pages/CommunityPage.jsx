@@ -64,6 +64,7 @@ const CommunityPage = () => {
             }
         } catch (err) {
             console.error(err);
+            alert('Failed to post: ' + (err.message || 'Server Error'));
         }
     };
 
@@ -194,10 +195,28 @@ const CommunityPage = () => {
                                         alt={post.username}
                                         className="w-10 h-10 rounded-full"
                                     />
-                                    <div>
-                                        <h3 className="text-white font-bold">{post.username}</h3>
-                                        <span className="text-xs text-teal-400 uppercase tracking-wider border border-teal-400/30 px-2 py-0.5 rounded-full">{post.role}</span>
-                                        <span className="text-gray-500 text-xs ml-2">{new Date(post.created_at).toLocaleDateString()}</span>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="text-white font-bold">{post.username}</h3>
+                                            <span className="text-xs text-teal-400 uppercase tracking-wider border border-teal-400/30 px-2 py-0.5 rounded-full">{post.role}</span>
+                                            <span className="text-gray-500 text-xs ml-2">{new Date(post.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        {user && user.id === post.user_id && (
+                                            <button
+                                                onClick={async () => {
+                                                    if (!confirm('Delete this post?')) return;
+                                                    const token = localStorage.getItem('token');
+                                                    try {
+                                                        const res = await fetch(`${API_URL}/api/community/${post.id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+                                                        if (res.ok) fetchPosts();
+                                                        else alert('Failed to delete');
+                                                    } catch (e) { console.error(e); }
+                                                }}
+                                                className="text-gray-500 hover:text-red-500 text-xs"
+                                            >
+                                                🗑️
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{post.content}</p>

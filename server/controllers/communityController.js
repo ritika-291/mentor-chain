@@ -25,7 +25,7 @@ export const getPosts = async (req, res) => {
         res.json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 };
 
@@ -87,6 +87,23 @@ export const getPostComments = async (req, res) => {
         res.json(comments);
     } catch (error) {
         console.error('Error fetching comments:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + error.message });
+    }
+};
+
+export const deletePost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const ownerId = await Community.getOwner(id);
+        if (!ownerId) return res.status(404).json({ message: 'Post not found' });
+        if (ownerId !== userId) return res.status(403).json({ message: 'Not authorized' });
+
+        await db.execute(`DELETE FROM community_posts WHERE id = ?`, [id]);
+        res.json({ message: 'Post deleted' });
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 };

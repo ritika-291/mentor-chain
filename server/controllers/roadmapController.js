@@ -29,7 +29,13 @@ export const createRoadmap = async (req, res) => {
 // Public/All: Get all roadmaps
 export const getAllRoadmaps = async (req, res) => {
     try {
-        const roadmaps = await Roadmap.getAllRoadmaps();
+        const { mentorId } = req.query;
+        let roadmaps;
+        if (mentorId) {
+            roadmaps = await Roadmap.getByMentor(mentorId);
+        } else {
+            roadmaps = await Roadmap.getAllRoadmaps();
+        }
         res.json(roadmaps);
     } catch (err) {
         console.error(err);
@@ -45,7 +51,7 @@ export const getMyRoadmaps = async (req, res) => {
         res.json(roadmaps);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + err.message });
     }
 };
 
@@ -90,5 +96,40 @@ export const updateProgress = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const deleteRoadmap = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const ownerId = await Roadmap.getOwner(id);
+        if (!ownerId) return res.status(404).json({ message: 'Roadmap not found' });
+        if (ownerId !== userId) return res.status(403).json({ message: 'Not authorized' });
+
+        await Roadmap.delete(id);
+        res.json({ message: 'Roadmap deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error: ' + err.message });
+    }
+};
+
+export const updateRoadmap = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description } = req.body;
+        const userId = req.user.id;
+
+        const ownerId = await Roadmap.getOwner(id);
+        if (!ownerId) return res.status(404).json({ message: 'Roadmap not found' });
+        if (ownerId !== userId) return res.status(403).json({ message: 'Not authorized' });
+
+        await Roadmap.update(id, title, description);
+        res.json({ message: 'Roadmap updated' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error: ' + err.message });
     }
 };

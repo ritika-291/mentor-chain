@@ -45,11 +45,12 @@ const RoadmapBuilder = () => {
             if (res.ok) {
                 navigate('/mentor/roadmaps'); // Redirect to listing
             } else {
-                alert('Failed to create roadmap');
+                const data = await res.json();
+                alert('Failed to create roadmap: ' + (data.message || 'Unknown Error'));
             }
         } catch (err) {
             console.error(err);
-            alert('Server error');
+            alert('Server error: ' + err.message);
         } finally {
             setLoading(false);
         }

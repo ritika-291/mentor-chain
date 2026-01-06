@@ -83,7 +83,14 @@ const RoadmapDetail = () => {
                         <span className="bg-gray-800 px-3 py-1 rounded text-sm border border-gray-700">
                             By {roadmap.mentor_name}
                         </span>
-                        {/* Only show enroll if mentee and not started? Check progress existence implies enrollment usually */}
+                        {userRole === 'mentee' && (
+                            <button
+                                onClick={handleEnroll}
+                                className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-1.5 rounded text-sm font-bold transition-colors shadow-lg"
+                            >
+                                Join / Enroll 🚀
+                            </button>
+                        )}
                     </div>
                 </div>
 

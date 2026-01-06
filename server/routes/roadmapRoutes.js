@@ -2,7 +2,8 @@
 import express from 'express';
 import {
     createRoadmap, getAllRoadmaps, getMyRoadmaps,
-    getRoadmapDetails, enrollRoadmap, updateProgress
+    getRoadmapDetails, enrollRoadmap, updateProgress,
+    deleteRoadmap, updateRoadmap
 } from '../controllers/roadmapController.js';
 import { authenticate as protect } from '../middleware/authMiddleware.js';
 
@@ -14,6 +15,8 @@ router.get('/:id', protect, getRoadmapDetails); // Get one details (needs auth f
 
 // Mentor
 router.post('/', protect, createRoadmap); // Create new
+router.delete('/:id', protect, deleteRoadmap); // Delete
+router.put('/:id', protect, updateRoadmap); // Update title/desc
 
 // Mentee
 router.get('/my/enrolled', protect, getMyRoadmaps); // Get enrolled roadmaps

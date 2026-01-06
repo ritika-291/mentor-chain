@@ -282,6 +282,12 @@ const MentorProfileDetail = () => {
               </div>
             </div>
 
+            {/* Roadmaps Section */}
+            <div className="mb-10">
+              <h3 className="text-2xl font-bold text-white mb-6">Roadmaps by {mentor.name}</h3>
+              <MentorRoadmaps mentorId={mentor.id} />
+            </div>
+
             {/* Booking Section */}
             <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col items-center justify-center text-center">
               <h3 className="text-3xl font-bold text-white mb-6">Ready to start?</h3>
@@ -389,6 +395,54 @@ const MentorProfileDetail = () => {
         )}
       </div>
       <Footer />
+    </div>
+  );
+};
+
+const MentorRoadmaps = ({ mentorId }) => {
+  const [roadmaps, setRoadmaps] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      // Handle "real-" prefix
+      const realId = mentorId.toString().startsWith('real-') ? mentorId.replace('real-', '') : mentorId;
+
+      // If dummy ID (int), skip fetching from API for now or mock it
+      if (!mentorId.toString().startsWith('real-')) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/roadmaps?mentorId=${realId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setRoadmaps(data);
+        }
+      } catch (err) {
+        console.error("Error fetching roadmaps:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRoadmaps();
+  }, [mentorId]);
+
+  if (loading) return <p className="text-gray-400">Loading roadmaps...</p>;
+  if (roadmaps.length === 0) return <p className="text-gray-500 italic">No roadmaps created yet.</p>;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {roadmaps.map(roadmap => (
+        <a key={roadmap.id} href={`/mentee/roadmaps/${roadmap.id}`} className="block">
+          <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 hover:border-teal-500 transition-colors">
+            <h4 className="text-lg font-bold text-teal-400">{roadmap.title}</h4>
+            <p className="text-gray-400 text-sm mt-1 line-clamp-2">{roadmap.description}</p>
+            <span className="text-xs text-gray-500 mt-2 block">{roadmap.total_steps || 0} Steps</span>
+          </div>
+        </a>
+      ))}
     </div>
   );
 };
