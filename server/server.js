@@ -119,6 +119,17 @@ const startServer = async () => {
     }
 };
 
-startServer();
+// Export app for Vercel
+export default app;
 
-export default server;
+// Only start server if not running in Vercel (or if run directly)
+if (process.env.NODE_ENV !== 'production') {
+    startServer();
+} else {
+    // In production (Vercel), we might still need to connect to DB/start jobs, 
+    // but we SHOULD NOT call server.listen() as Vercel handles the port.
+    // However, we still need to initialize things.
+    // Actually, on Vercel, the file is imported and the handler is called.
+    // We can just rely on the top-level imports for DB connection.
+    console.log("Running in Production mode (Vercel compatible)");
+}
