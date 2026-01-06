@@ -45,7 +45,14 @@ const Mentors = () => {
                             realId: m.id, // Store raw ID for logic
                             name: m.username,
                             title: m.expertise && m.expertise[0] ? `${m.expertise[0]} Expert` : 'Mentor',
-                            expertise: m.expertise || [],
+                            expertise: (() => {
+                                if (Array.isArray(m.expertise)) return m.expertise;
+                                if (typeof m.expertise === 'string') {
+                                    try { return JSON.parse(m.expertise); }
+                                    catch (e) { return m.expertise.split(',').map(s => s.trim()); }
+                                }
+                                return [];
+                            })(),
                             rating: m.rating || 5.0,
                             availability_status: m.availability_status === 'available' ? 'High' : (m.availability_status === 'busy' ? 'Low' : 'Medium'),
                             mentee_count: 0,
