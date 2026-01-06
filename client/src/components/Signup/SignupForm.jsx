@@ -40,7 +40,7 @@ const SignupForm = ({ role }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("DEBUG: Attempting Signup - Version 2 (Fetch Added)");
+        console.log("DEBUG: Attempting Signup - Version 2.1 (Renamed response to apiRes)"); // Version Log
 
         try {
             const bodyData = {
@@ -56,7 +56,7 @@ const SignupForm = ({ role }) => {
             };
 
 
-            const response = await fetch(`${API_URL}/api/auth/register`, {
+            const apiRes = await fetch(`${API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,12 +64,12 @@ const SignupForm = ({ role }) => {
                 body: JSON.stringify(bodyData),
             });
 
-            console.log('Raw response from backend:', response); // Log the raw response
+            console.log('Raw response from backend:', apiRes); // Log the raw response
 
-            const data = await response.json();
+            const data = await apiRes.json();
             console.log('Parsed data from backend:', data); // Log the parsed data
 
-            if (response.ok) {
+            if (apiRes.ok) {
                 console.log('Signup successful:', data);
                 // Store token and user data
                 if (data.token) {
