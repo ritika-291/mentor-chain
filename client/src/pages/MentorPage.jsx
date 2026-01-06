@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import MentorProfileCard from '../components/cards/MentorProfileCard';
 import SkeletonMentorCard from '../components/cards/SkeletonMentorCard';
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
 import mentorDetailsData from '../data/MentorDetailsData';
 import { useSearchParams } from 'react-router-dom';
 
@@ -35,7 +37,14 @@ const MentorsPage = () => {
                         company: "MentorChain",
                         rating: Number(m.average_rating) || 0,
                         reviews: m.reviews_count || 0,
-                        expertise: typeof m.expertise === 'string' ? JSON.parse(m.expertise) : (m.expertise || []),
+                        expertise: (() => {
+                            if (Array.isArray(m.expertise)) return m.expertise;
+                            if (typeof m.expertise === 'string') {
+                                try { return JSON.parse(m.expertise); }
+                                catch (e) { return m.expertise.split(',').map(s => s.trim()); }
+                            }
+                            return [];
+                        })(),
                         availability_status: "High", // Default or map if available
                         image: m.avatar_url || "https://randomuser.me/api/portraits/men/1.jpg" // Placeholder if null
                     }));
@@ -104,71 +113,75 @@ const MentorsPage = () => {
 
 
     return (
-        <div className="space-y-8 p-4 md:p-8 min-h-screen bg-gray-900 text-white transition-colors duration-500">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
-                Find Your Mentor 🔍
-            </h1>
+        <div className="min-h-screen bg-gray-900 text-white">
+            <Navbar />
+            <div className="pt-24 p-4 md:p-8 space-y-8">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
+                    Find Your Mentor 🔍
+                </h1>
 
-            {/* --- Search and Filter Bar --- */}
-            <div className="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 space-y-4">
+                {/* --- Search and Filter Bar --- */}
+                <div className="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 space-y-4">
 
-                {/* Search Input */}
-                <input
-                    type="text"
-                    placeholder="Search by name, title, or skill..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-4 border border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-transparent bg-gray-700/50 text-white placeholder-gray-400 transition-all shadow-sm"
-                />
+                    {/* Search Input */}
+                    <input
+                        type="text"
+                        placeholder="Search by name, title, or skill..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full p-4 border border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-transparent bg-gray-700/50 text-white placeholder-gray-400 transition-all shadow-sm"
+                    />
 
-                {/* Filters and Sort */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <select
-                        value={selectedExpertise}
-                        onChange={(e) => setSelectedExpertise(e.target.value)}
-                        className="flex-1 p-3 border border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-transparent bg-gray-700/50 text-white transition-all shadow-sm"
-                    >
-                        {allExpertise.map(skill => (
-                            <option key={skill} value={skill}>{skill === 'All' ? 'All Expertise' : skill}</option>
-                        ))}
-                    </select>
+                    {/* Filters and Sort */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <select
+                            value={selectedExpertise}
+                            onChange={(e) => setSelectedExpertise(e.target.value)}
+                            className="flex-1 p-3 border border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-transparent bg-gray-700/50 text-white transition-all shadow-sm"
+                        >
+                            {allExpertise.map(skill => (
+                                <option key={skill} value={skill}>{skill === 'All' ? 'All Expertise' : skill}</option>
+                            ))}
+                        </select>
 
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="flex-1 p-3 border border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-transparent bg-gray-700/50 text-white transition-all shadow-sm"
-                    >
-                        <option value="rating">Sort by Rating (High to Low)</option>
-                        <option value="availability">Sort by Availability</option>
-                    </select>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="flex-1 p-3 border border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-transparent bg-gray-700/50 text-white transition-all shadow-sm"
+                        >
+                            <option value="rating">Sort by Rating (High to Low)</option>
+                            <option value="availability">Sort by Availability</option>
+                        </select>
+                    </div>
+                    <p className="text-sm font-medium text-gray-400 pl-1">
+                        Showing <span className="text-teal-400 font-bold">{loading ? '...' : filteredAndSortedMentors.length}</span> mentors matching your criteria.
+                    </p>
                 </div>
-                <p className="text-sm font-medium text-gray-400 pl-1">
-                    Showing <span className="text-teal-400 font-bold">{loading ? '...' : filteredAndSortedMentors.length}</span> mentors matching your criteria.
-                </p>
-            </div>
 
-            {/* --- Mentors List --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {loading ? (
-                    // Show 6 skeleton cards while loading
-                    Array.from({ length: 6 }).map((_, index) => (
-                        <SkeletonMentorCard key={index} />
-                    ))
-                ) : (
-                    filteredAndSortedMentors.length > 0 ? (
-                        filteredAndSortedMentors.map((mentor) => (
-                            <MentorProfileCard
-                                key={mentor.id}
-                                mentor={mentor}
-                            />
+                {/* --- Mentors List --- */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {loading ? (
+                        // Show 6 skeleton cards while loading
+                        Array.from({ length: 6 }).map((_, index) => (
+                            <SkeletonMentorCard key={index} />
                         ))
                     ) : (
-                        <div className="col-span-full text-center py-10 text-gray-500 dark:text-gray-400">
-                            No mentors found matching your search.
-                        </div>
-                    )
-                )}
+                        filteredAndSortedMentors.length > 0 ? (
+                            filteredAndSortedMentors.map((mentor) => (
+                                <MentorProfileCard
+                                    key={mentor.id}
+                                    mentor={mentor}
+                                />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-10 text-gray-500 dark:text-gray-400">
+                                No mentors found matching your search.
+                            </div>
+                        )
+                    )}
+                </div>
             </div>
+            <Footer />
         </div>
     );
 };
