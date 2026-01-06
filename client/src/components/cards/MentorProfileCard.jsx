@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const MentorProfileCard = ({ mentor }) => {
-    const { id, name, title, expertise, rating, mentee_count, availability_status } = mentor;
+    const { id, name, title, expertise: rawExpertise, rating, mentee_count, availability_status } = mentor;
+
+    // Fix for Bug #3: Ensure expertise is an array
+    const expertise = Array.isArray(rawExpertise)
+        ? rawExpertise
+        : (typeof rawExpertise === 'string' ? rawExpertise.split(',').map(s => s.trim()) : []);
 
     const getAvailabilityClasses = (status) => {
         switch (status) {

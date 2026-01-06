@@ -21,8 +21,8 @@ export const createRoadmap = async (req, res) => {
 
         res.status(201).json({ message: 'Roadmap created', roadmapId });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error('FAILED TO CREATE ROADMAP:', err.message, err.stack);
+        res.status(500).json({ message: 'Roadmap creation failed: ' + err.message });
     }
 };
 

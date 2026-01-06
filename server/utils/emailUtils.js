@@ -48,14 +48,14 @@ async function createTransporter() {
 const sendEmail = async (to, subject, htmlContent) => {
     try {
         const currentTransporter = await createTransporter();
-        
+
         // Get the from email (either from env or use a default)
         let fromEmail = process.env.EMAIL_SERVICE_USER || 'noreply@mentorchain.com';
         // If it's still the placeholder, we'll need to get it from the transporter or use a default
         if (fromEmail === 'ETHEREAL_USER_PLACEHOLDER') {
             fromEmail = 'noreply@mentorchain.com';
         }
-        
+
         const mailOptions = {
             from: fromEmail, // Sender address
             to: to,                          // List of recipients
@@ -68,7 +68,7 @@ const sendEmail = async (to, subject, htmlContent) => {
         console.log('Message sent: %s', info.messageId);
         // Only log Ethereal URL if using test account
         if (process.env.EMAIL_SERVICE_USER === 'ETHEREAL_USER_PLACEHOLDER' || !process.env.EMAIL_SERVICE_USER) {
-            console.log('Ethereal preview URL: %s', nodemailer.getTestMessageUrl(info));
+            console.warn('[ETHEREAL EMAIL SENT] Preview URL:', nodemailer.getTestMessageUrl(info));
         }
         return info;
     } catch (error) {

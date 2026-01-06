@@ -166,6 +166,11 @@ const Navbar = () => {
                                     Features
                                 </a>
                             </li>
+                            <li>
+                                <NavLink to='/community' className="block py-2 text-gray-300 font-medium hover:text-teal-400 transition duration-300 ease-in-out" onClick={() => setIsMenuOpen(false)}>
+                                    Community
+                                </NavLink>
+                            </li>
                         </ul>
                     </nav>
 
