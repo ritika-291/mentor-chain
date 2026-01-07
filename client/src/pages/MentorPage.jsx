@@ -115,7 +115,7 @@ const MentorsPage = () => {
     return (
         <div className="min-h-screen bg-gray-900 text-white">
             <Navbar />
-            <div className="pt-24 p-4 md:p-8 space-y-8">
+            <div className="p-4 md:p-8 space-y-8" style={{ paddingTop: '160px' }}>
                 <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-600 drop-shadow-sm">
                     Find Your Mentor 🔍
                 </h1>

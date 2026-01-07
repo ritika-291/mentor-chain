@@ -138,37 +138,18 @@ const profileController = {
                 return res.status(400).json({ message: 'No file uploaded' });
             }
 
-            const fileUrl = `/uploads/${req.file.filename}`;
+            // Convert buffer to Base64
+            const b64 = Buffer.from(req.file.buffer).toString('base64');
+            const mimeType = req.file.mimetype;
+            const fileUrl = `data:${mimeType};base64,${b64}`;
+
             const user = await User.findUserById(userId);
 
             // If mentor, update mentor profile avatar_url
             if (user.role === 'mentor' || user.role === 'Mentor') {
-                // Delete old avatar if exists
-                const mentorProfile = await Mentor.getByUserId(userId);
-                if (mentorProfile && mentorProfile.avatar_url) {
-                    const oldFilePath = path.join(__dirname, '..', mentorProfile.avatar_url);
-                    try {
-                        await fs.unlink(oldFilePath);
-                    } catch (err) {
-                        console.error('Error deleting old avatar:', err);
-                        // Continue even if deletion fails
-                    }
-                }
-
                 await Mentor.upsertProfile(userId, { avatar_url: fileUrl });
             } else {
                 // For mentees, store avatar_url in users table
-                // Delete old avatar if exists
-                if (user.avatar_url) {
-                    const oldFilePath = path.join(__dirname, '..', user.avatar_url);
-                    try {
-                        await fs.unlink(oldFilePath);
-                    } catch (err) {
-                        console.error('Error deleting old avatar:', err);
-                        // Continue even if deletion fails
-                    }
-                }
-
                 await User.updateUser(userId, { avatar_url: fileUrl });
             }
 

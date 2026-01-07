@@ -27,6 +27,11 @@ const ForgotPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
+        if (data.resetUrl) {
+          console.log("========================================");
+          console.log("DEBUG: Password Reset Link:", data.resetUrl);
+          console.log("========================================");
+        }
         setMessage(data.message || 'If an account exists with that email, a password reset link has been sent.');
       } else {
         setError(data.message || 'Something went wrong. Please try again.');

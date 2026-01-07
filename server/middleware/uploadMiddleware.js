@@ -41,6 +41,16 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-export const uploadProfilePicture = upload.single('profilePicture');
+// Configure memory storage for profile pictures (Vercel compatibility)
+const memoryStorage = multer.memoryStorage();
+const memoryUpload = multer({
+  storage: memoryStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: fileFilter
+});
+
+export const uploadProfilePicture = memoryUpload.single('profilePicture');
 
 export default upload;

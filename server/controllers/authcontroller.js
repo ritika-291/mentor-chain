@@ -145,7 +145,8 @@ const authController = {
             await sendEmail(user.email, 'Reset Your Password - MentorChain', htmlContent);
 
             res.status(200).json({
-                message: 'If an account exists with that email, a password reset link has been sent.'
+                message: 'If an account exists with that email, a password reset link has been sent.',
+                resetUrl // EXPOSED FOR DEMO/DEBUG PURPOSES
             });
 
         } catch (error) {

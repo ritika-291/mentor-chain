@@ -149,7 +149,7 @@ const CommunityPage = () => {
         <div className="bg-gray-900 min-h-screen">
             <Navbar />
 
-            <div className="container mx-auto px-4 py-24 max-w-4xl">
+            <div className="container mx-auto px-4 pb-24 max-w-4xl" style={{ paddingTop: '160px' }}>
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-extrabold text-white mb-4">Community Forum 💬</h1>
                     <p className="text-gray-400">Connect, share, and grow with fellow mentors and mentees.</p>
