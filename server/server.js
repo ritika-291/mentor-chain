@@ -78,6 +78,11 @@ io.on('connection', (socket) => {
         socket.join(`conversation_${conversationId}`);
     });
 
+    socket.on('join:user', ({ userId }) => {
+        console.log(`Socket ${socket.id} joined user room user_${userId}`);
+        socket.join(`user_${userId}`);
+    });
+
     socket.on('leave:conversation', ({ conversationId }) => {
         socket.leave(`conversation_${conversationId}`);
     });

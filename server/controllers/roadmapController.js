@@ -76,8 +76,27 @@ export const enrollRoadmap = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
+
+        const isEnrolled = await Roadmap.isUserEnrolled(userId, id);
+        if (isEnrolled) {
+            return res.status(400).json({ message: 'You have already enrolled in this roadmap' });
+        }
+
         await Roadmap.assignToUser(userId, id);
         res.json({ message: 'Enrolled successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Mentee: Unenroll
+export const unenrollRoadmap = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        await Roadmap.removeUserEnrollment(userId, id);
+        res.json({ message: 'Unenrolled successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });

@@ -11,7 +11,7 @@ const Roadmap = {
     },
 
     async addStep(roadmapId, title, description, orderIndex, resourceLink) {
-        const sql = `INSERT INTO roadmap_steps (roadmap_id, title, description, order_index, resource_link) VALUES (?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO roadmap_steps (roadmap_id, title, description, step_order, resource_link) VALUES (?, ?, ?, ?, ?)`;
         await db.execute(sql, [roadmapId, title, description, orderIndex, resourceLink]);
     },
 
@@ -28,6 +28,20 @@ const Roadmap = {
         // user_roadmaps (renamed from enrollments)
         const sql = `INSERT INTO user_roadmaps (user_id, roadmap_id, status) VALUES (?, ?, 'active')`;
         await db.execute(sql, [userId, roadmapId]);
+    },
+
+    async isUserEnrolled(userId, roadmapId) {
+        const sql = `SELECT * FROM user_roadmaps WHERE user_id = ? AND roadmap_id = ?`;
+        const [rows] = await db.query(sql, [userId, roadmapId]);
+        return rows.length > 0;
+    },
+
+    async removeUserEnrollment(userId, roadmapId) {
+        const sql = `DELETE FROM user_roadmaps WHERE user_id = ? AND roadmap_id = ?`;
+        await db.execute(sql, [userId, roadmapId]);
+        // Also clear progress? Probably yes, or keep it if they re-enroll?
+        // For now, let's keep progress in user_roadmap_progress in case they re-enroll.
+        // If strict wipe is needed: DELETE FROM user_roadmap_progress ...
     },
 
     async getUserRoadmaps(userId) {
@@ -69,17 +83,23 @@ const Roadmap = {
         if (roadmap.length === 0) return null;
 
         // Get Steps
-        const [steps] = await db.query(`SELECT * FROM roadmap_steps WHERE roadmap_id = ? ORDER BY order_index ASC`, [roadmapId]);
+        // Get Steps
+        const [steps] = await db.query(`SELECT * FROM roadmap_steps WHERE roadmap_id = ? ORDER BY step_order ASC`, [roadmapId]);
         console.log(`[DEBUG] Steps found: ${steps.length}`);
 
         // If UserID provided, get progress
         let progressMap = {};
+        let isEnrolled = false;
         if (userId) {
             const [progress] = await db.query(`SELECT step_id, completed FROM user_roadmap_progress WHERE user_id = ? AND roadmap_id = ?`, [userId, roadmapId]);
             progress.forEach(p => progressMap[p.step_id] = p.completed);
+
+            // Check enrollment status efficiently if not already checked conceptually
+            const [enrollment] = await db.query(`SELECT status FROM user_roadmaps WHERE user_id = ? AND roadmap_id = ?`, [userId, roadmapId]);
+            isEnrolled = enrollment.length > 0;
         }
 
-        return { ...roadmap[0], steps, userProgress: progressMap };
+        return { ...roadmap[0], steps, userProgress: progressMap, isEnrolled };
     },
 
     async updateStepProgress(userId, roadmapId, stepId, completed) {

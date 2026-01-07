@@ -52,6 +52,11 @@ const Conversation = {
             GROUP BY c.id
         `, [user1Id, user2Id]);
         return rows.length > 0 ? rows[0] : null;
+    },
+
+    async getParticipants(conversationId) {
+        const [rows] = await db.execute('SELECT user_id FROM conversation_participants WHERE conversation_id = ?', [conversationId]);
+        return rows;
     }
 };
 

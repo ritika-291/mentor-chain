@@ -1,5 +1,6 @@
 import Conversation from '../models/conversationModel.js';
 import Message from '../models/messageModel.js';
+import Notification from '../models/notificationModel.js';
 
 const ConversationController = {
     async createConversation(req, res) {
@@ -62,10 +63,41 @@ const ConversationController = {
 
             const msg = await Message.createMessage(convoId, userId, content);
 
+            // Create Notifications for other participants
+            try {
+                const participants = await Conversation.getParticipants(convoId);
+                for (const p of participants) {
+                    if (p.user_id !== userId) {
+                        await Notification.create(p.user_id, 'message', 'New message received', convoId);
+                    }
+                }
+            } catch (notifyErr) {
+                console.error("Failed to create notification:", notifyErr);
+            }
+
             // Emit socket event if server has access to io
             if (req.app && req.app.get('io')) {
                 const io = req.app.get('io');
                 io.to(`conversation_${convoId}`).emit('message:new', msg);
+
+                // Also emit notification event to specific users
+                // We re-fetch participants here or reuse from above scope if possible.
+                // Assuming participants array is available from the notification creation block above.
+                try {
+                    const participants = await Conversation.getParticipants(convoId);
+                    for (const p of participants) {
+                        if (p.user_id !== userId) {
+                            io.to(`user_${p.user_id}`).emit('notification:new', {
+                                type: 'message',
+                                message: 'New message received',
+                                related_id: convoId,
+                                created_at: new Date()
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to emit notification socket event', e);
+                }
             }
 
             return res.status(201).json(msg);
