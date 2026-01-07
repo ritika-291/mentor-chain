@@ -51,7 +51,9 @@ const Profile = () => {
               : (data.profile.expertise || ''));
             setHourlyRate(data.profile.hourly_rate || '');
             setAvatarUrl(data.profile.avatar_url
-              ? `${API_URL}${data.profile.avatar_url}`
+              ? (data.profile.avatar_url.startsWith('data:') || data.profile.avatar_url.startsWith('http')
+                ? data.profile.avatar_url
+                : `${API_URL}${data.profile.avatar_url}`)
               : '');
           }
         } else {
@@ -108,7 +110,8 @@ const Profile = () => {
 
         if (avatarResponse.ok) {
           const avatarData = await avatarResponse.json();
-          setAvatarUrl(`${API_URL}${avatarData.avatar_url}`);
+          const avUrl = avatarData.avatar_url;
+          setAvatarUrl((avUrl.startsWith('data:') || avUrl.startsWith('http')) ? avUrl : `${API_URL}${avUrl}`);
           setAvatarFile(null);
         } else {
           throw new Error('Failed to upload profile picture');
@@ -191,7 +194,7 @@ const Profile = () => {
           <div className="flex items-center space-x-6 pb-4 border-b border-gray-700">
             <img
               className="h-24 w-24 rounded-full object-cover ring-4 ring-teal-600 shadow-lg"
-              src={avatarUrl || 'https://via.placeholder.com/150'}
+              src={avatarUrl || `https://ui-avatars.com/api/?name=${username}&background=random&size=150`}
               alt="Current Profile"
             />
             <div>

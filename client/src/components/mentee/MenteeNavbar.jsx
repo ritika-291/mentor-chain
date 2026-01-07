@@ -42,7 +42,8 @@ const MenteeNavbar = ({ toggleSidebar }) => {
           const data = await profileRes.json();
           if (data.username) setUsername(data.username);
           if (data.profile && data.profile.avatar_url) {
-            setAvatarUrl(`${API_URL}${data.profile.avatar_url}`);
+            const url = data.profile.avatar_url;
+            setAvatarUrl((url.startsWith('data:') || url.startsWith('http')) ? url : `${API_URL}${url}`);
           }
         }
 
@@ -151,7 +152,7 @@ const MenteeNavbar = ({ toggleSidebar }) => {
           {/* Profile Picture */}
           <button className="focus:outline-none">
             <img
-              src={avatarUrl || 'https://via.placeholder.com/40/6366f1/ffffff?text=M'}
+              src={avatarUrl || `https://ui-avatars.com/api/?name=${username}&background=random`}
               alt="Profile"
               className="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500"
             />

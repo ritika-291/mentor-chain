@@ -39,7 +39,8 @@ const NavbarDashboard = ({ toggleSidebar }) => {
             setUsername(data.username);
           }
           if (data.profile && data.profile.avatar_url) {
-            setAvatarUrl(`${API_URL}${data.profile.avatar_url}`);
+            const url = data.profile.avatar_url;
+            setAvatarUrl((url.startsWith('data:') || url.startsWith('http')) ? url : `${API_URL}${url}`);
           }
         }
       } catch (err) {
@@ -96,7 +97,7 @@ const NavbarDashboard = ({ toggleSidebar }) => {
           </button>
           <button className="focus:outline-none">
             <img
-              src={avatarUrl || 'https://via.placeholder.com/40'}
+              src={avatarUrl || `https://ui-avatars.com/api/?name=${username}&background=random`}
               alt="profile"
               className="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500"
             />

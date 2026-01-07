@@ -74,7 +74,8 @@ const MenteeProfile = () => {
 
           // Initialize avatar URL if stored
           if (data.profile && data.profile.avatar_url) {
-            setAvatarUrl(`${API_URL}${data.profile.avatar_url}`);
+            const url = data.profile.avatar_url;
+            setAvatarUrl(url.startsWith('data:') || url.startsWith('http') ? url : `${API_URL}${url}`);
           }
 
           // Initialize selected goals if stored in backend
@@ -153,7 +154,8 @@ const MenteeProfile = () => {
 
         if (avatarResponse.ok) {
           const avatarData = await avatarResponse.json();
-          const newAvatarUrl = `${API_URL}${avatarData.avatar_url}`;
+          const avUrl = avatarData.avatar_url;
+          const newAvatarUrl = (avUrl.startsWith('data:') || avUrl.startsWith('http')) ? avUrl : `${API_URL}${avUrl}`;
           setAvatarUrl(newAvatarUrl);
           setAvatarFile(null);
           // Store avatar URL in profile state for navbar access
@@ -250,7 +252,7 @@ const MenteeProfile = () => {
             <div className="relative">
               <img
                 className="h-24 w-24 rounded-full object-cover ring-4 ring-teal-600 shadow-lg"
-                src={avatarUrl || 'https://via.placeholder.com/150/6366f1/ffffff?text=M'}
+                src={avatarUrl || `https://ui-avatars.com/api/?name=${username}&background=random&size=150`}
                 alt="Current Profile"
               />
               <label
