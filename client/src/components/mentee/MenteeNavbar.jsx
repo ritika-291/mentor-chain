@@ -1,52 +1,85 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config/api";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { io } from "socket.io-client";
 
 const MenteeNavbar = ({ toggleSidebar }) => {
   const [username, setUsername] = useState('Mentee');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get username from localStorage
+    let socket;
     const userStr = localStorage.getItem('user');
+    let userId = null;
+
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
         setUsername(user.username || 'Mentee');
+        userId = user.id;
       } catch (e) {
         console.error('Error parsing user data:', e);
       }
     }
 
-    // Fetch profile to get avatar
-    const fetchProfile = async () => {
+    // Fetch profile and notifications
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if (!token) return;
 
-        const response = await fetch(`${API_URL}/api/profile/me`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data.username) {
-            setUsername(data.username);
-          }
+        // Fetch Profile
+        const profileRes = await fetch(`${API_URL}/api/profile/me`, { headers });
+        if (profileRes.ok) {
+          const data = await profileRes.json();
+          if (data.username) setUsername(data.username);
           if (data.profile && data.profile.avatar_url) {
             setAvatarUrl(`${API_URL}${data.profile.avatar_url}`);
           }
         }
+
+        // Fetch Notifications
+        const notifRes = await fetch(`${API_URL}/api/notifications`, { headers });
+        if (notifRes.ok) {
+          const notifications = await notifRes.json();
+          if (Array.isArray(notifications)) {
+            const count = notifications.filter(n => !n.is_read && !n.read).length;
+            setUnreadCount(count);
+          } else {
+            setUnreadCount(0);
+          }
+        }
+
       } catch (err) {
-        console.error('Error fetching profile for navbar:', err);
+        console.error('Error fetching navbar data:', err);
       }
     };
 
-    fetchProfile();
+    fetchData();
+
+    // Socket.io for real-time notifications
+    if (userId) {
+      socket = io(API_URL);
+      socket.emit('join:user', { userId });
+
+      socket.on('notification:new', (data) => {
+        console.log('New notification received:', data);
+        setUnreadCount(prev => prev + 1);
+      });
+    }
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
+
   }, []);
 
   const handleLogout = () => {
@@ -86,6 +119,29 @@ const MenteeNavbar = ({ toggleSidebar }) => {
 
         {/* Right Section: Profile & Logout */}
         <div className="flex items-center space-x-3 sm:space-x-4">
+
+          {/* Back to Home */}
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none"
+            aria-label="Back to Home"
+          >
+            <span className="mr-1">←</span> <span className="hidden sm:inline text-sm">Home</span>
+          </button>
+
+          {/* Notification Icon */}
+          <button
+            onClick={() => navigate('/mentee/notifications')}
+            className="relative p-2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+            aria-label="Notifications"
+          >
+            <IoNotificationsOutline className="w-6 h-6" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-gray-800">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
 
           {/* Welcome Message */}
           <span className="text-gray-200 font-medium hidden sm:inline text-sm">

@@ -76,6 +76,15 @@ const NavbarDashboard = ({ toggleSidebar }) => {
 
         {/* User Info and Profile */}
         <div className="flex items-center space-x-4">
+          {/* Back to Home */}
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none"
+            aria-label="Back to Home"
+          >
+            <span className="mr-1">←</span> <span className="hidden sm:inline text-sm">Home</span>
+          </button>
+
           <span className="text-gray-200 font-medium hidden sm:inline">
             Hello, <strong>{username}</strong>
           </span>

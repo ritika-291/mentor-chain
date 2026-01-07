@@ -151,53 +151,7 @@ const Profile = () => {
     }
   };
 
-  // Password State
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Handle password change
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    try {
-      const token = getAuthToken();
-      const response = await fetch(`${API_URL}/api/auth/change-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          oldPassword: currentPassword,
-          newPassword
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('Password changed successfully');
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        setError(data.message || 'Failed to change password');
-      }
-    } catch (err) {
-      console.error('Error changing password:', err);
-      setError('Failed to change password. Please try again.');
-    }
-  };
 
   if (loading) {
     return (
@@ -354,64 +308,7 @@ const Profile = () => {
           </div>
         </form>
 
-        {/* Section: Security and Password */}
-        <div className="pt-8 mt-8 border-t border-gray-700">
-          <h3 className="text-2xl font-bold text-white mb-6 border-b pb-3 border-gray-700">
-            Security
-          </h3>
 
-          <form onSubmit={handlePasswordChange} className="space-y-4">
-            <div>
-              <label htmlFor="current-password" className="block text-sm font-medium text-gray-300 mb-1">
-                Current Password
-              </label>
-              <input
-                type="password"
-                id="current-password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter current password"
-                className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="new-password" className="block text-sm font-medium text-gray-300 mb-1">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  id="new-password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                  className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
-                />
-              </div>
-              <div>
-                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-1">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  id="confirm-password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  className="mt-1 block w-full p-3 border border-gray-600 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-white placeholder-gray-400"
-                />
-              </div>
-            </div>
-            <div className="pt-4">
-              <button
-                type="submit"
-                className="w-full py-3 px-4 border border-transparent rounded-xl shadow-xl text-lg font-bold text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-150"
-              >
-                Change Password
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
     </div>
   );

@@ -1,11 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { API_URL } from '../config/api';
 
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const location = useLocation();
+
+    // Determine current user role context from URL
+    const isMentee = location.pathname.startsWith('/mentee');
+    const isMentor = location.pathname.startsWith('/mentor');
 
     useEffect(() => {
         fetchNotifications();
@@ -41,7 +46,18 @@ const NotificationsPage = () => {
                 });
             } catch (err) { console.error(err); }
         }
-        // Navigate could happen via standard Link behavior or imperative here
+    };
+
+    const getLink = (n) => {
+        if (n.type === 'message') {
+            return isMentee ? '/mentee/messages' : isMentor ? '/mentor/messages' : '/community';
+        }
+        if (n.type === 'roadmap') {
+            // Assuming roadmap URLs follow this pattern
+            return isMentee ? `/mentee/roadmaps/${n.related_id}` : `/mentor/roadmaps/${n.related_id}`;
+        }
+        // Fallback for like/comment/etc
+        return '/community';
     };
 
     return (
@@ -53,10 +69,9 @@ const NotificationsPage = () => {
             ) : notifications.length > 0 ? (
                 <div className="max-w-3xl mx-auto space-y-4">
                     {notifications.map(n => (
-                        // Using Link to post if it exists
                         <Link
                             key={n.id}
-                            to={`/community`} // Assuming we just link to community feed for now, ideally to specific post anchor
+                            to={getLink(n)}
                             onClick={() => markRead(n.id, n.related_id, n.is_read)}
                             className={`block p-4 rounded-xl border transition-colors flex items-center justify-between
                                 ${n.is_read ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-800 border-teal-500/50 text-white shadow-lg shadow-teal-500/10'}`}
@@ -69,7 +84,7 @@ const NotificationsPage = () => {
                                 </div>
                             </div>
                             <span className="text-xl">
-                                {n.type === 'like' ? '❤️' : n.type === 'comment' ? '💬' : '📢'}
+                                {n.type === 'like' ? '❤️' : n.type === 'comment' ? '💬' : n.type === 'message' ? '📩' : '📢'}
                             </span>
                         </Link>
                     ))}

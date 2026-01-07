@@ -59,11 +59,14 @@ const RoadmapDetail = () => {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            const data = await res.json();
             if (res.ok) {
                 alert('Enrolled! You can now track progress.');
                 fetchDetails(); // Reload to update state
+            } else {
+                alert(data.message || 'Failed to enroll');
             }
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error(err); alert('Something went wrong'); }
     };
 
     if (loading) return <div className="p-8 text-white">Loading...</div>;
@@ -84,12 +87,29 @@ const RoadmapDetail = () => {
                             By {roadmap.mentor_name}
                         </span>
                         {userRole === 'mentee' && (
-                            <button
-                                onClick={handleEnroll}
-                                className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-1.5 rounded text-sm font-bold transition-colors shadow-lg"
-                            >
-                                Join / Enroll 🚀
-                            </button>
+                            <>
+                                {!roadmap.isEnrolled ? (
+                                    <button
+                                        onClick={handleEnroll}
+                                        className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-1.5 rounded text-sm font-bold transition-colors shadow-lg flex items-center gap-2"
+                                    >
+                                        Join / Enroll 🚀
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={async () => {
+                                            if (!confirm('Are you sure you want to unenroll?')) return;
+                                            const token = localStorage.getItem('token');
+                                            await fetch(`${API_URL}/api/roadmaps/${id}/unenroll`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+                                            alert('Unenrolled successfully');
+                                            fetchDetails();
+                                        }}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-sm font-bold transition-colors shadow-lg flex items-center gap-2"
+                                    >
+                                        Unenroll ✖️
+                                    </button>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
@@ -123,7 +143,12 @@ const RoadmapDetail = () => {
                                             </h3>
                                             <p className="text-gray-400 mb-3">{step.description}</p>
                                             {step.resource_link && (
-                                                <a href={step.resource_link} target="_blank" rel="noreferrer" className="text-blue-400 text-sm hover:underline">
+                                                <a
+                                                    href={step.resource_link.startsWith('http') ? step.resource_link : `https://${step.resource_link}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-blue-400 text-sm hover:underline"
+                                                >
                                                     View Resource ↗
                                                 </a>
                                             )}
